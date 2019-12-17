@@ -1,4 +1,4 @@
-package com.chat.example;
+package com.chat.example.oneToOne;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
