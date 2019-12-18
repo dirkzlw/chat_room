@@ -19,12 +19,13 @@ public class Server {
             while (true) {
                 Socket client = server.accept();
                 String clientName = new DataInputStream(client.getInputStream()).readUTF();
-                System.out.println(clientName + "已连接..." + "当前人数：" + ++PublicUtils.online);
+                DataUtils.clientList.add(client);
+//                System.out.println(clientName + "已连接..." + "当前人数：" + ++DataUtils.online);
+                ChatManager.sendToClients(clientName + "已连接..." + "当前人数：" + ++DataUtils.online);
                 new ServerThread(client, clientName).start();
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 }

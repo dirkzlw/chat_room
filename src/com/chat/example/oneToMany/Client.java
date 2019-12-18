@@ -15,8 +15,9 @@ public class Client {
     public static void main(String[] args){
 
         try {
-            Socket client = new Socket("127.0.0.1", 8088);
-            DataOutputStream dos = new DataOutputStream(client.getOutputStream());
+            Socket server = new Socket("127.0.0.1", 8088);
+            new ClientThread(server).start();
+            DataOutputStream dos = new DataOutputStream(server.getOutputStream());
             //随机生成名字发送至server
             dos.writeUTF(String.format("%04d", (int)(Math.random() * 10000)));
             dos.flush();
@@ -33,8 +34,8 @@ public class Client {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("服务器已关闭...");
+            System.exit(0);
         }
-
     }
 }

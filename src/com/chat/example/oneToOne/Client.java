@@ -14,9 +14,9 @@ public class Client {
     public static void main(String[] args) {
         new Thread(() -> {
             try {
-                Socket client = new Socket("127.0.0.1", 80);
-                DataInputStream dis  = new DataInputStream(client.getInputStream());
-                DataOutputStream dos = new DataOutputStream(client.getOutputStream());
+                Socket server = new Socket("127.0.0.1", 80);
+                DataInputStream dis  = new DataInputStream(server.getInputStream());
+                DataOutputStream dos = new DataOutputStream(server.getOutputStream());
                 BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
                 while (true){
                     //获取控制台输入，发送至服务端
