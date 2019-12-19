@@ -3,8 +3,6 @@ package com.chat.client.dao.impl;
 import com.chat.client.dao.UserDao;
 import com.chat.client.po.User;
 import org.hibernate.SessionFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.support.JdbcDaoSupport;
 import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.orm.hibernate5.support.HibernateDaoSupport;
 import org.springframework.stereotype.Repository;
@@ -26,38 +24,56 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 
     }
 
+
     /**
-     * 注册
+     * 检查用户名是否已被注册
+     *
+     * @param username
+     * @return
+     */
+    @Override
+    public boolean checkExist(String username) {
+        HibernateTemplate template = this.getHibernateTemplate();
+        //检查用户名是否已被注册
+        List<User> userList = (List<User>) template.find("from User where username = ?", username);
+        if (null != userList && userList.size() > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 保存用户
+     *
      * @param user
      * @return
      */
     @Override
-    public boolean regist(User user) {
-
+    public boolean saveUser(User user) {
         HibernateTemplate template = this.getHibernateTemplate();
-        //检查用户名是否已被注册
-        List<User> userList = (List<User>) template.find("from User where username = ?", user.getUsername());
-        if (null != userList && userList.size() > 0) {
+        try {
+            template.save(user);
+        } catch (Exception e) {
             return false;
         }
-        template.save(user);
         return true;
     }
 
     /**
-     * 登录
-     * @param user
+     * 根据用户名和密码查找用户
+     *
+     * @param username
+     * @param password
      * @return
      */
     @Override
-    public boolean login(User user) {
+    public User findUser(String username, String password) {
         HibernateTemplate template = this.getHibernateTemplate();
-        //检查用户名是否已被注册
-        List<User> userList = (List<User>) template.find("from User where username = ? and password=?",
-                user.getUsername(),user.getPassword());
-        if (null != userList && userList.size() == 1) {
-            return true;
+        List<User> userList = (List<User>) template
+                .find("from User where username = ? and password = ?", username, password);
+        if (null != userList && userList.size() > 0) {
+            return userList.get(0);
         }
-        return false;
+        return null;
     }
 }

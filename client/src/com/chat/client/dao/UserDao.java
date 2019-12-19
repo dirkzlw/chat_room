@@ -8,7 +8,9 @@ import com.chat.client.po.User;
  */
 public interface UserDao {
 
-    boolean regist(User user);
+    boolean checkExist(String username);
 
-    boolean login(User user);
+    boolean saveUser(User user);
+
+    User findUser(String username, String password);
 }

@@ -18,15 +18,22 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserDao userDao;
 
+    private String headUrl = "39.107.249.220:888/img/scul.png";
+    private String signStr = "留下您的个性签名！";
+
     @Override
     public boolean regist(String username, String password) {
-        User user = new User(username, MD5Utils.md5(password));
-        return userDao.regist(user);
+        if (!userDao.checkExist(username)) {
+            return userDao.saveUser(new User(username,
+                    MD5Utils.md5(password),
+                    headUrl, signStr));
+        }
+        return false;
     }
 
     @Override
-    public boolean login(String username, String password) {
-        User user = new User(username, MD5Utils.md5(password));
-        return userDao.login(user);
+    public User login(String username, String password) {
+        return userDao.findUser(username,MD5Utils.md5(password));
     }
+
 }

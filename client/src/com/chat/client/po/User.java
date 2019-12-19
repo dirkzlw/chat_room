@@ -15,13 +15,16 @@ public class User {
     private Integer userId;
     private String username;
     private String password;
+    private String headUrl;
+    private String signStr;
 
     public User() {
     }
 
-    public User(String username, String password) {
-        this.userId = userId;
+    public User(String username, String password, String headUrl, String signStr) {
         this.username = username;
         this.password = password;
+        this.headUrl = headUrl;
+        this.signStr = signStr;
     }
 }

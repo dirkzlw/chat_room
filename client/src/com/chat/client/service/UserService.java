@@ -1,6 +1,6 @@
 package com.chat.client.service;
 
-import org.springframework.stereotype.Service;
+import com.chat.client.po.User;
 
 /**
  * @author Ranger
@@ -9,5 +9,5 @@ import org.springframework.stereotype.Service;
 public interface UserService {
     boolean regist(String username, String password);
 
-    boolean login(String dirk, String zhou);
+    User login(String username, String password);
 }

@@ -9,5 +9,7 @@
 		</id>
 		<property name="username" column="username"/>
 		<property name="password" column="password"/>
+		<property name="headUrl" column="head_url"/>
+		<property name="signStr" column="sign_str"/>
 	</class>
 </hibernate-mapping>

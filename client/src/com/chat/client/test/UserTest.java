@@ -24,12 +24,8 @@ public class UserTest {
      */
     @Test
     public void login(){
-        boolean b = userService.login("dirk", "zhou2");
-        if(b){
-            System.out.println("登录成功！");
-        }else {
-            System.out.println("登录失败！");
-        }
+        User login = userService.login("dirk", "xxx");
+        System.out.println("login = " + login);
     }
 
     /**
