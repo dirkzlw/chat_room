@@ -1,7 +1,23 @@
 package com.chat.client.view;
 
+import com.chat.client.po.User;
+import com.chat.client.service.UserService;
+import com.chat.client.service.impl.UserServiceImpl;
+import com.chat.client.utils.FtpUtils;
 import com.chat.client.utils.WindowXY;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import javax.accessibility.AccessibleContext;
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.text.AttributeSet;
@@ -19,8 +35,14 @@ import java.io.IOException;
  * @create 2019-12-18 21:55
  */
 public class IndexFrame extends PlainDocument {
+
+    ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
+    private UserService userService = ctx.getBean(UserService.class);
+
     private JFrame frame;
     private int limit;  //限制的长度
+
+    public IndexFrame(){}
 
     public IndexFrame(int limit) {
         super(); //调用父类构造
@@ -35,7 +57,7 @@ public class IndexFrame extends PlainDocument {
         }
     }
 
-    public IndexFrame() {
+    public IndexFrame(User user) {
         // 设置窗口外观
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -58,23 +80,38 @@ public class IndexFrame extends PlainDocument {
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // 关闭窗口程序结束
         frame.setLayout(null); // 布局设置为空
 
-        //添加头像
-        ImageIcon scul = new ImageIcon("img/head/scul.png");
+        //添加头像--先从本地读取，未读到根据url下载到本地
+        String[] split = user.getHeadUrl().split("/");
+        File f = new File("img/head/" + split[split.length - 1]);
+        if (!f.exists()) {
+            String srcFileName = split[split.length - 1];
+            String suf = srcFileName.split("\\.")[1];
+            FtpUtils.downFile("39.107.249.220",
+                    21,
+                    "html_fs",
+                    "html_fs_pwd",
+                    "img",
+                    split[split.length - 1],
+                    "img/head",
+                    split[split.length - 1]);
+        }
+        ImageIcon headIcon = new ImageIcon("img/head/" + split[split.length - 1]);
+
         JLabel sculLabel = new JLabel();
         sculLabel.setBounds(50, 50, (int) (0.045 * width), (int) (0.078 * height));
-        scul.setImage(scul.getImage().getScaledInstance((int) (0.045 * width),
+        headIcon.setImage(headIcon.getImage().getScaledInstance((int) (0.045 * width),
                 (int) (0.078 * height), Image.SCALE_DEFAULT));
-        sculLabel.setIcon(scul);
+        sculLabel.setIcon(headIcon);
         frame.add(sculLabel);
 
         //添加昵称
-        JLabel nameLabel = new JLabel("Ranger");
+        JLabel nameLabel = new JLabel(user.getUsername());
         nameLabel.setFont(new Font("System", Font.PLAIN, 26));
         nameLabel.setBounds(70 + (int) (0.045 * width), 50, (int) (0.045 * width), 30);
         frame.add(nameLabel);
 
         //添加签名
-        String signStr = "编写签名！";
+        String signStr = user.getSignStr();
         JTextField signField = new JTextField();
         signField.setEditable(false);
         signField.setFont(new Font("System", Font.PLAIN, 15));
@@ -88,11 +125,17 @@ public class IndexFrame extends PlainDocument {
                 signField.setEditable(true);
                 signField.getCaret().setVisible(true);
             }
-
+        });
+        frame.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseExited(MouseEvent e) {
-                signField.setEditable(false);
-                signField.getCaret().setVisible(false);
+            public void mouseClicked(MouseEvent e) {
+                if(signField.isEnabled()){
+                    signField.setEditable(false);
+                    signField.getCaret().setVisible(false);
+                    user.setSignStr(signField.getText().trim());
+                    System.out.println("userService = " + userService);
+                    userService.saveUser(user);
+                }
             }
         });
         frame.add(signField);
@@ -110,7 +153,7 @@ public class IndexFrame extends PlainDocument {
         tabbedPane.add("我的好友", panel1);
         panel1.setLayout(null);
         //头像列表
-        ImageIcon[] headImg = new ImageIcon[10] ;
+        ImageIcon[] headImg = new ImageIcon[10];
         for (int i = 0; i < headImg.length; i++) {
             headImg[i] = new ImageIcon("img/head/h" + i + ".jpg");
         }
@@ -123,7 +166,7 @@ public class IndexFrame extends PlainDocument {
         panel1_0.setLayout(null);
 
         for (int i = 0; i < headList.length; i++) {
-            headImg[i].setImage(headImg[i].getImage().getScaledInstance(50,50, Image.SCALE_DEFAULT));
+            headImg[i].setImage(headImg[i].getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
             headList[i] = new JLabel(headImg[i]);
             headList[i].setBounds(0, i * 70, 50, 50);
             panel1_0.add(headList[i]);
@@ -166,7 +209,12 @@ public class IndexFrame extends PlainDocument {
     }
 
     public static void main(String[] args) {
-        new IndexFrame();
+        User user = new User("dirk", null,
+                "39.107.249.220:888/img/scul.png",
+                "留下您的个性签名！");
+        user.setUserId(1);
+
+        new IndexFrame(user);
     }
 
 }

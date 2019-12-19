@@ -10,4 +10,6 @@ public interface UserService {
     boolean regist(String username, String password);
 
     User login(String username, String password);
+
+    void saveUser(User user);
 }

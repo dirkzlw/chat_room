@@ -36,4 +36,8 @@ public class UserServiceImpl implements UserService {
         return userDao.findUser(username,MD5Utils.md5(password));
     }
 
+    @Override
+    public void saveUser(User user) {
+        userDao.saveUser(user);
+    }
 }
