@@ -1,8 +1,7 @@
 package com.chat.client.utils;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.FileOutputStream;
@@ -10,8 +9,6 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-
-import javax.imageio.ImageIO;
 
 public class CodeUtil {
     private static int width = 140;// 定义图片的width
@@ -84,18 +81,23 @@ public class CodeUtil {
         Map<String,Object> map  =new HashMap<String,Object>();
         //存放验证码
         map.put("code", randomCode);
+//        System.out.println("验证码："+randomCode);
         //存放生成的验证码BufferedImage对象
         map.put("codePic", buffImg);
         return map;
     }
 
-    public static void run()  throws Exception {
+    public static StringBuffer run()  throws Exception {
+        String codePathName = "img/code";
         //创建文件输出流对象
         map = CodeUtil.generateCodeAndPic();
-        OutputStream out = new FileOutputStream("D://img/"+map.get("code")+".jpg");
+        OutputStream out = new FileOutputStream(codePathName+"/"+map.get("code")+".jpg");
         ImageIO.write((RenderedImage) map.get("codePic"), "jpeg", out);
+        //获取文件名
+        return (StringBuffer) map.get("code");
     }
     public static void main(String[] args) throws Exception {
-        run();
+
+        System.out.println( run());
     }
 }
