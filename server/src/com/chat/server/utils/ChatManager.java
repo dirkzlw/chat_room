@@ -16,6 +16,7 @@ import java.net.Socket;
 public class ChatManager {
 
     private static OutputStream os;
+
     private static DataOutputStream dos;
     private static InputStream is;
     private static DataInputStream dis;
