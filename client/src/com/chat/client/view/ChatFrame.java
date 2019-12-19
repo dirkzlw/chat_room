@@ -5,8 +5,6 @@ import com.chat.client.utils.WindowXY;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -48,7 +46,7 @@ public class ChatFrame {
         frame.setBounds((int) (0.2 * width), (int) (0.13 * height), (int) (0.61 * width), (int) (0.7 * height));
         try {
             //设置图标
-            frame.setIconImage(ImageIO.read(new FileInputStream(new File("img/logo.png")))); // 设置图标
+            frame.setIconImage(ImageIO.read(new FileInputStream(new File("img/surface/logo.png")))); // 设置图标
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -112,7 +110,7 @@ public class ChatFrame {
         frame.add(panel2);
 
         //添加斗图的标签
-        JLabel tuLabel = new JLabel(new ImageIcon("img/tu.png"));
+        JLabel tuLabel = new JLabel(new ImageIcon("img/surface/tu.png"));
         tuLabel.setBounds(10, (int) (0.585 * 0.7 * height), 40, (int) (0.045 * 0.7 * height));
         tuLabel.addMouseListener(new MouseAdapter() {
             @Override
@@ -123,7 +121,7 @@ public class ChatFrame {
         frame.add(tuLabel);
 
         //添加发送文件的图标
-        JLabel fileLabel = new JLabel(new ImageIcon("img/file.png"));
+        JLabel fileLabel = new JLabel(new ImageIcon("img/surface/file.png"));
         fileLabel.setBounds((int) ((0.08* 0.7 * height)), (int) (0.585 * 0.7 * height), 40, (int) (0.045 * 0.7 * height));
         fileLabel.addMouseListener(new MouseAdapter() {
             @Override
@@ -140,7 +138,7 @@ public class ChatFrame {
         //初始化三个图片
         ImageIcon[] ads = new ImageIcon[5];
         for (int i = 0; i < ads.length; i++) {
-            ads[i] = new ImageIcon("img/ad" + i + ".jpg");
+            ads[i] = new ImageIcon("img/ad/ad" + i + ".jpg");
             ads[i].setImage(ads[i].getImage().getScaledInstance((int) (0.22 * 0.6 * width) + 8,
                     (int) (0.585 * 0.7 * height),
                     Image.SCALE_DEFAULT));
