@@ -4,6 +4,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
@@ -89,6 +90,10 @@ public class CodeUtil {
 
     public static StringBuffer run()  throws Exception {
         String codePathName = "img/code";
+        File dir = new File(codePathName);
+        if(!dir.exists()){
+            dir.mkdirs();
+        }
         //创建文件输出流对象
         map = CodeUtil.generateCodeAndPic();
         OutputStream out = new FileOutputStream(codePathName+"/"+map.get("code")+".jpg");

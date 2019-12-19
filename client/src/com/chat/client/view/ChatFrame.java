@@ -4,13 +4,16 @@ import com.chat.client.utils.WindowXY;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -22,10 +25,10 @@ import java.util.TimerTask;
 public class ChatFrame {
 
     private JFrame frame;
+    private TuFrame tuFrame;
     private Timer timer;
 
-    public ChatFrame() {
-    }
+    public ChatFrame() {}
 
     public ChatFrame(String title) {
 
@@ -35,9 +38,8 @@ public class ChatFrame {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Point point = WindowXY.getXY();
-        double width = point.getX();
-        double height = point.getY();
+        double width = WindowXY.getWidth();
+        double height = WindowXY.getHeight();
         Font font = new Font("System", Font.PLAIN, 18);
         frame = new JFrame();
         //设置窗口相关参数
@@ -115,19 +117,48 @@ public class ChatFrame {
         tuLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                System.out.println("发送斗图");
+                if(null == tuFrame || null ==tuFrame.getFrame()){
+                    Point p = MouseInfo.getPointerInfo().getLocation();
+                    tuFrame = new TuFrame((int) p.getX(), (int) p.getY() - 130);
+                }
             }
         });
         frame.add(tuLabel);
 
         //添加发送文件的图标
         JLabel fileLabel = new JLabel(new ImageIcon("img/surface/file.png"));
-        fileLabel.setBounds((int) ((0.08* 0.7 * height)), (int) (0.585 * 0.7 * height), 40, (int) (0.045 * 0.7 * height));
+        fileLabel.setBounds((int) ((0.08 * 0.7 * height)), (int) (0.585 * 0.7 * height), 40, (int) (0.045 * 0.7 * height));
         fileLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-
-                System.out.println("发送文件");
+                JFileChooser fileChooser = new JFileChooser("./"); // 文件选择器+默认路径
+                fileChooser.setFileFilter(new FileNameExtensionFilter("文本文件(*.txt)", "txt")); // 选择类型
+                int resultVal = fileChooser.showOpenDialog(null); // 显示选择器
+                File chooseFile;
+                if (resultVal == fileChooser.APPROVE_OPTION) { // 判断是否确定选择文件
+                    chooseFile = fileChooser.getSelectedFile(); // 返回所选择的的文件
+//                    try {
+//                        reader = new BufferedReader(new FileReader(chooseFile)); // 创建输入流
+//                        textIn.setText(""); // 清空代码区
+//                        // 读取整个文件
+//                        String line;
+//                        while ((line = reader.readLine()) != null) {
+//                            textIn.append(line + "\n"); // 按行写入代码区
+//                        }
+//                    } catch (Exception e1) {
+//                        e1.printStackTrace();
+//                    } finally {
+//                        try {
+//                            if (reader != null) {
+//                                reader.close(); // 关闭流
+//                            }
+//                        } catch (IOException e1) {
+//                        }
+//                    }
+                    System.out.println("导入文件:" + chooseFile.getPath());
+                } else {
+                    System.out.println("没有导入");
+                }
             }
         });
         frame.add(fileLabel);
@@ -140,8 +171,7 @@ public class ChatFrame {
         for (int i = 0; i < ads.length; i++) {
             ads[i] = new ImageIcon("img/ad/ad" + i + ".jpg");
             ads[i].setImage(ads[i].getImage().getScaledInstance((int) (0.22 * 0.6 * width) + 8,
-                    (int) (0.585 * 0.7 * height),
-                    Image.SCALE_DEFAULT));
+                    (int) (0.585 * 0.7 * height), Image.SCALE_DEFAULT));
         }
         JLabel adLabel = new JLabel(ads[0]);
         adLabel.setBounds((int) (0.783 * 0.6 * width) - 1, 0, (int) (0.22 * 0.6 * width) + 8, (int) (0.585 * 0.7 * height));
@@ -205,5 +235,56 @@ public class ChatFrame {
 
     public static void main(String[] args) {
         new ChatFrame("群聊");
+    }
+}
+
+class TuFrame {
+
+    private JFrame frame;
+
+    public JFrame getFrame() {
+        return frame;
+    }
+
+    public TuFrame(int x, int y) {
+        frame = new JFrame();
+        frame.setUndecorated(true);        //窗口去边框
+        frame.setAlwaysOnTop(true);        //设置窗口总在最前
+        frame.setBackground(new Color(0, 0, 0, 0));        //设置窗口背景为透明色
+        frame.setBounds(x, y, 250, 115);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(null);
+        panel.setBackground(Color.white);
+        panel.setBounds(0, 0, 250, 115);
+        frame.add(panel);
+        //添加关闭按钮
+        ImageIcon closeIcon = new ImageIcon("img/surface/close.png");
+        closeIcon.setImage(closeIcon.getImage().getScaledInstance(15, 15, Image.SCALE_DEFAULT));
+        JLabel closeBtn = new JLabel(closeIcon);
+        closeBtn.setBounds(230, 0, 15, 15);
+        closeBtn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                frame.dispose();
+                frame = null;
+            }
+        });
+        panel.add(closeBtn);
+
+        //添加表情包
+        ImageIcon[] imgs = new ImageIcon[10];
+        for (int i = 0; i < imgs.length; i++) {
+            imgs[i] = new ImageIcon("img/head/h" + i + ".jpg");
+        }
+        JLabel[] tuArr = new JLabel[10];
+        for (int i = 0; i < tuArr.length; i++) {
+            imgs[i].setImage(imgs[i].getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
+            tuArr[i] = new JLabel(imgs[i]);
+            tuArr[i].setBounds(i % 5 * 50, (i / 5) * 50 + 15, 50, 50);
+            panel.add(tuArr[i]);
+        }
+
+        frame.setVisible(true);
     }
 }

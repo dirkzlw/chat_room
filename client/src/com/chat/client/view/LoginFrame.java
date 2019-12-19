@@ -177,7 +177,7 @@ public class LoginFrame {
 
         try {
             //设置图标
-            frame.setIconImage(ImageIO.read(new FileInputStream(new File("img/logo.png")))); // 设置图标
+            frame.setIconImage(ImageIO.read(new FileInputStream(new File("img/surface/logo.png")))); // 设置图标
         } catch (IOException e) {
             e.printStackTrace();
         }

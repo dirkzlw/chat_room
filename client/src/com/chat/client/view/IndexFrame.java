@@ -42,9 +42,8 @@ public class IndexFrame extends PlainDocument {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Point point = WindowXY.getXY();
-        double width = point.getX();
-        double height = point.getY();
+        double width = WindowXY.getWidth();
+        double height = WindowXY.getHeight();
         frame = new JFrame();
         //设置窗口相关参数
         // 位置及大小
