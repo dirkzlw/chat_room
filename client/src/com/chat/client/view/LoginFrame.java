@@ -1,7 +1,12 @@
 package com.chat.client.view;
 
+import com.chat.client.po.User;
+import com.chat.client.service.UserService;
 import com.chat.client.utils.CodeUtil;
+import com.chat.client.utils.GlobalCodeMgr;
 import com.chat.client.utils.WindowXY;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -20,6 +25,15 @@ import java.io.IOException;
  */
 public class LoginFrame {
     private JFrame frame;
+    JTextField JT_username1 = new JTextField();
+    JPasswordField JT_password1 = new JPasswordField();
+    JTextField JT_checkcode = new JTextField();
+    JPasswordField JT_verPsw = new JPasswordField();
+
+
+    ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
+    private UserService userService = ctx.getBean(UserService.class);
+    StringBuffer codePicName;
     /**
      * 初始化窗口
      * para:页面长度
@@ -43,6 +57,30 @@ public class LoginFrame {
 
         JButton JB_login = new JButton("登录");
         JButton JB_registe = new JButton("注册");
+
+        /**
+         * 登录事件
+         */
+        JB_login.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                String username = JT_username.getText().trim();
+                String password = new String(JT_password.getPassword()).trim();
+
+                User user = new User(username,password,"img/head/h0.jpg","签名非我意！");
+                if(userService.login(username,password)!=null){
+                    //登录成功
+                    System.out.println("登录成功！");
+                    frame.setVisible(false);
+                    new IndexFrame(user);
+                    frame.dispose();
+                }else{
+                    JOptionPane.showMessageDialog(null,"用户名或密码错误！","登录失败",JOptionPane.PLAIN_MESSAGE);
+                }
+
+            }
+        });
 
         //注册
         JLabel JL_title = new JLabel("用户注册");
@@ -89,12 +127,14 @@ public class LoginFrame {
             StringBuffer codePicName;
             @Override
             public void actionPerformed(ActionEvent e) {
+                //清空注册页面的信息
+                clean();
                 flag = !flag;
                 if(flag){
                     //验证码生成
                     try {
-                        codePicName = CodeUtil.run();
-                        System.out.println("验证码为："+codePicName);
+                        GlobalCodeMgr.getInstance().setCode(CodeUtil.run());
+                        System.out.println("验证码为："+GlobalCodeMgr.getInstance().getCode());
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
@@ -141,9 +181,9 @@ public class LoginFrame {
             public void actionPerformed(ActionEvent e) {
 
                 try {
-                    codePicName = CodeUtil.run();
-                    JB_codePic.setIcon(new ImageIcon(codePathName+"\\"+codePicName+".jpg"));
-                    System.out.println("验证码为："+codePicName);
+                    GlobalCodeMgr.getInstance().setCode(CodeUtil.run());
+                    JB_codePic.setIcon(new ImageIcon(codePathName+"\\"+GlobalCodeMgr.getInstance().getCode()+".jpg"));
+                    JT_checkcode.setText("");
                 } catch (Exception e1) {
                     e1.printStackTrace();
                 }
@@ -160,17 +200,82 @@ public class LoginFrame {
         JB_abandan.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JT_username1.setText("");
-                JT_password1.setText("");
-                JT_verPsw.setText("");
-                JT_checkcode.setText("");
+                clean();
             }
         });
 
         JB_registe1.setBounds((int)(windowWeight*0.65),  (int)(windowHeight*0.67), (int)(windowWeight*0.17), (int)(windowHeight*0.053));
         JB_registe1.setBackground(Color.white);
         JB_registe1.setFont(font);
+        /**
+         * 注册事件
+         */
+        JB_registe1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String username = JT_username1.getText().trim();
+                String password = new String(JT_password1.getPassword()).trim();
+                String verPsw = new String(JT_verPsw.getPassword()).trim();
+                String code = JT_checkcode.getText().trim();
+                System.out.println("用户名："+username);
 
+                /**
+                 * 用户名：4到16位（字母，数字，下划线，减号）
+                 * 密码：长度为4-20的所有字符）
+                 */
+                String reg_username = "^[a-zA-Z0-9_-]{4,16}$";
+                String reg_password = "^.{4,20}$";
+
+                if(!username.matches(reg_username)){
+                    JOptionPane.showMessageDialog(null,"用户名格式不对！","提醒",JOptionPane.PLAIN_MESSAGE);
+                    return;
+                }
+                if(!password.matches(reg_password)){
+                    JOptionPane.showMessageDialog(null,"密码长度至少4位！","提醒",JOptionPane.PLAIN_MESSAGE);
+                    return;
+
+                }
+                if(!password.equals(verPsw)){
+                    System.out.println("两次密码输入不一致");
+                    JOptionPane.showMessageDialog(null,"两次密码输入不一致！","提醒",JOptionPane.PLAIN_MESSAGE);
+
+                    JT_password1.setText("");
+                    JT_verPsw.setText("");
+                    return;
+                }
+                System.out.println("验证码为"+GlobalCodeMgr.getInstance().getCode());
+                //判断验证码是否正确
+                if (!(GlobalCodeMgr.getInstance().getCode().toString()).equalsIgnoreCase(code)){
+                    System.out.println("验证码不一致");
+                    JOptionPane.showMessageDialog(null,"验证码不正确！","提醒",JOptionPane.PLAIN_MESSAGE);
+                    try {
+                        GlobalCodeMgr.getInstance().setCode(CodeUtil.run());
+                        JB_codePic.setIcon(new ImageIcon(codePathName+"\\"+GlobalCodeMgr.getInstance().getCode()+".jpg"));
+                        JT_checkcode.setText("");
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
+                    }
+                    return;
+                }
+
+                /**
+                 * 注册
+                 */
+                boolean flag = userService.regist(username, password);
+                if(flag){
+                    JOptionPane.showMessageDialog(null,"注册成功！","提醒",JOptionPane.PLAIN_MESSAGE);
+                    //注册成功：回到登录页面，并清空注册页面文本框
+                    frame.setSize((int) (WindowXY.getWidth() * (0.262)), (int) (WindowXY.getHeight() * (0.27)));
+                    clean();
+                }else{
+                    /**
+                     * 注册失败：用户名重复
+                     * 验证码要刷新
+                     */
+                    JOptionPane.showMessageDialog(null,"用户名重复！","提醒",JOptionPane.PLAIN_MESSAGE);
+                }
+            }
+        });
 
         frame.setLayout(null);
         frame.setTitle("QQ");
@@ -216,6 +321,16 @@ public class LoginFrame {
         frame.setLocation((int)(WindowXY.getWidth()*0.36),(int)(WindowXY.getHeight()*0.2));
         frame.setResizable(false);
         frame.setVisible(true);
+    }
+
+    /**
+     * 清空文本框
+     */
+    public void clean(){
+        JT_username1.setText("");
+        JT_password1.setText("");
+        JT_verPsw.setText("");
+        JT_checkcode.setText("");
     }
 
     public LoginFrame() {
