@@ -77,8 +77,8 @@ public class LoginFrame {
                 String username = JT_username.getText().trim();
                 String password = new String(JT_password.getPassword()).trim();
 
-                User user = new User(username,password,"img/head/h0.jpg","签名非我意！");
-                if(userService.login(username,password)!=null){
+                User user = userService.login(username,password);
+                if(user!=null){
                     //登录成功
                     System.out.println("登录成功！");
                     frame.setVisible(false);
@@ -150,8 +150,6 @@ public class LoginFrame {
                     //变长：1、长度改变 2、验证码变化 3、弹框提示账号密码格式
                     frame.setSize((int) (WindowXY.getWidth() * (0.262)), (int) (WindowXY.getHeight() * (0.6)));
                     JB_codePic.setIcon(new ImageIcon(codePathName+"\\"+GlobalCodeMgr.getInstance().getCode()+".jpg"));
-                    JOptionPane.showMessageDialog(null,"用户名：4到16位（字母，数字，下划线，减号）\n" +
-                            "                 密码：长度为4-20的所有字符","注册格式提示",JOptionPane.PLAIN_MESSAGE);
                 }else{
                     frame.setSize((int) (WindowXY.getWidth() * (0.262)), (int) (WindowXY.getHeight() * (0.27)));
                 }
@@ -233,22 +231,22 @@ public class LoginFrame {
                 String code = JT_checkcode.getText().trim();
                 System.out.println("用户名："+username);
 
-                /**
-                 * 用户名：4到16位（字母，数字，下划线，减号）
-                 * 密码：长度为4-20的所有字符）
-                 */
-                String reg_username = "^[a-zA-Z0-9_-]{4,16}$";
-                String reg_password = "^.{4,20}$";
-
-                if(!username.matches(reg_username)){
-                    JOptionPane.showMessageDialog(null,"用户名格式不对！","提醒",JOptionPane.PLAIN_MESSAGE);
-                    return;
-                }
-                if(!password.matches(reg_password)){
-                    JOptionPane.showMessageDialog(null,"密码长度至少4位！","提醒",JOptionPane.PLAIN_MESSAGE);
-                    return;
-
-                }
+//                /**
+//                 * 用户名：4到16位（字母，数字，下划线，减号）
+//                 * 密码：长度为4-20的所有字符）
+//                 */
+//                String reg_username = "^[a-zA-Z0-9_-]{4,16}$";
+//                String reg_password = "^.{4,20}$";
+//
+//                if(!username.matches(reg_username)){
+//                    JOptionPane.showMessageDialog(null,"用户名格式不对！","提醒",JOptionPane.PLAIN_MESSAGE);
+//                    return;
+//                }
+//                if(!password.matches(reg_password)){
+//                    JOptionPane.showMessageDialog(null,"密码长度至少4位！","提醒",JOptionPane.PLAIN_MESSAGE);
+//                    return;
+//
+//                }
                 if(!password.equals(verPsw)){
                     System.out.println("两次密码输入不一致");
                     JOptionPane.showMessageDialog(null,"两次密码输入不一致！","提醒",JOptionPane.PLAIN_MESSAGE);
