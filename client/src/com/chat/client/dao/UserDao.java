@@ -12,5 +12,7 @@ public interface UserDao {
 
     boolean saveUser(User user);
 
+    boolean updateSign(User user);
+
     User findUser(String username, String password);
 }

@@ -37,6 +37,7 @@ public class LoginFrame {
     ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
     private UserService userService = ctx.getBean(UserService.class);
     StringBuffer codePicName;
+
     /**
      * 初始化窗口
      * para:页面长度
@@ -45,14 +46,14 @@ public class LoginFrame {
     public void initFrame(double para) {
 
         JLabel backgroud = new JLabel(new ImageIcon("img/surface/backgroud.jpg"));
-        backgroud.setBounds(0, 0, (int)( WindowXY.getWidth() * (0.262)),(int) (WindowXY.getHeight() * (0.6)));
+        backgroud.setBounds(0, 0, (int) (WindowXY.getWidth() * (0.262)), (int) (WindowXY.getHeight() * (0.6)));
 
 
         String codePathName = "img/code";
         //设置字体
         Font font = new Font("System", Font.PLAIN, 18);
 
-        int windowWeight = (int)(WindowXY.getWidth() * (0.25));
+        int windowWeight = (int) (WindowXY.getWidth() * (0.25));
         int windowHeight = (int) (WindowXY.getHeight() * (0.6));
 
         JPanel loginPanel = new JPanel();
@@ -77,15 +78,16 @@ public class LoginFrame {
                 String username = JT_username.getText().trim();
                 String password = new String(JT_password.getPassword()).trim();
 
-                User user = new User(username,password,"img/head/h0.jpg","签名非我意！");
-                if(userService.login(username,password)!=null){
+                User user = userService.login(username, password);
+
+                if (null != user) {
                     //登录成功
                     System.out.println("登录成功！");
                     frame.setVisible(false);
                     new IndexFrame(user);
                     frame.dispose();
-                }else{
-                    JOptionPane.showMessageDialog(null,"用户名或密码错误！","登录失败",JOptionPane.PLAIN_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(null, "用户名或密码错误！", "登录失败", JOptionPane.PLAIN_MESSAGE);
                 }
 
             }
@@ -110,21 +112,21 @@ public class LoginFrame {
         JButton JB_abandan = new JButton("放弃");
         JButton JB_registe1 = new JButton("注册");
 
-        loginPanel.setBounds(0,0,windowWeight,windowHeight/3);
+        loginPanel.setBounds(0, 0, windowWeight, windowHeight / 3);
         loginPanel.setLayout(null);
 
-        JL_username.setBounds((int)(windowWeight*0.24), (int)(windowHeight*0.12), (int)(windowWeight*0.125), (int)(windowHeight*0.03));
+        JL_username.setBounds((int) (windowWeight * 0.24), (int) (windowHeight * 0.12), (int) (windowWeight * 0.125), (int) (windowHeight * 0.03));
         JL_username.setFont(font);
-        JL_password.setBounds((int)(windowWeight*0.24), (int)(windowHeight*0.16), (int)(windowWeight*0.125), (int)(windowHeight*0.03));
+        JL_password.setBounds((int) (windowWeight * 0.24), (int) (windowHeight * 0.16), (int) (windowWeight * 0.125), (int) (windowHeight * 0.03));
         JL_password.setFont(font);
-        JT_username.setBounds((int)(windowWeight*0.40), (int)(windowHeight*0.11), (int)(windowWeight*0.27), (int)(windowHeight*0.038));
+        JT_username.setBounds((int) (windowWeight * 0.40), (int) (windowHeight * 0.11), (int) (windowWeight * 0.27), (int) (windowHeight * 0.038));
         JT_username.setFont(font);
-        JT_password.setBounds((int)(windowWeight*0.40), (int)(windowHeight*0.157), (int)(windowWeight*0.27), (int)(windowHeight*0.038));
+        JT_password.setBounds((int) (windowWeight * 0.40), (int) (windowHeight * 0.157), (int) (windowWeight * 0.27), (int) (windowHeight * 0.038));
         JT_password.setFont(font);
-        JB_login.setBounds((int)(windowWeight*0.25),  (int)(windowHeight*0.23), (int)(windowWeight*0.17), (int)(windowHeight*0.053));
+        JB_login.setBounds((int) (windowWeight * 0.25), (int) (windowHeight * 0.23), (int) (windowWeight * 0.17), (int) (windowHeight * 0.053));
         JB_login.setFont(font);
         JB_login.setBackground(Color.white);
-        JB_registe.setBounds((int)(windowWeight*0.65),  (int)(windowHeight*0.23), (int)(windowWeight*0.17), (int)(windowHeight*0.053));
+        JB_registe.setBounds((int) (windowWeight * 0.65), (int) (windowHeight * 0.23), (int) (windowWeight * 0.17), (int) (windowHeight * 0.053));
         JB_registe.setFont(font);
         JB_registe.setBackground(Color.white);
         /**
@@ -134,25 +136,26 @@ public class LoginFrame {
         JB_registe.addActionListener(new ActionListener() {
             boolean flag = false;
             StringBuffer codePicName;
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 //清空注册页面的信息
                 clean();
                 flag = !flag;
-                if(flag){
+                if (flag) {
                     //验证码生成
                     try {
                         GlobalCodeMgr.getInstance().setCode(CodeUtil.run());
-                        System.out.println("验证码为："+GlobalCodeMgr.getInstance().getCode());
+                        System.out.println("验证码为：" + GlobalCodeMgr.getInstance().getCode());
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
                     //变长：1、长度改变 2、验证码变化 3、弹框提示账号密码格式
                     frame.setSize((int) (WindowXY.getWidth() * (0.262)), (int) (WindowXY.getHeight() * (0.6)));
-                    JB_codePic.setIcon(new ImageIcon(codePathName+"\\"+GlobalCodeMgr.getInstance().getCode()+".jpg"));
-                    JOptionPane.showMessageDialog(null,"用户名：4到16位（字母，数字，下划线，减号）\n" +
-                            "                 密码：长度为4-20的所有字符","注册格式提示",JOptionPane.PLAIN_MESSAGE);
-                }else{
+                    JB_codePic.setIcon(new ImageIcon(codePathName + "\\" + GlobalCodeMgr.getInstance().getCode() + ".jpg"));
+                    JOptionPane.showMessageDialog(null, "用户名：4到16位（字母，数字，下划线，减号）\n" +
+                            "                 密码：长度为4-20的所有字符", "注册格式提示", JOptionPane.PLAIN_MESSAGE);
+                } else {
                     frame.setSize((int) (WindowXY.getWidth() * (0.262)), (int) (WindowXY.getHeight() * (0.27)));
                 }
             }
@@ -161,41 +164,42 @@ public class LoginFrame {
         //设置边框
         registPanel.setBorder(BorderFactory.createTitledBorder("用户注册"));
         registPanel.setLayout(null);
-        registPanel.setBounds((int)(windowWeight*0.095), (int)(windowHeight*0.413), (int)(windowWeight*0.8), (int)(windowHeight*0.38));
+        registPanel.setBounds((int) (windowWeight * 0.095), (int) (windowHeight * 0.413), (int) (windowWeight * 0.8), (int) (windowHeight * 0.38));
         //设置面板为透明
         registPanel.setOpaque(false);
 
-        JL_username1.setBounds((int)(windowWeight*0.24), (int)(windowHeight*0.458), (int)(windowWeight*0.125), (int)(windowHeight*0.03));
+        JL_username1.setBounds((int) (windowWeight * 0.24), (int) (windowHeight * 0.458), (int) (windowWeight * 0.125), (int) (windowHeight * 0.03));
         JL_username1.setFont(font);
-        JT_username1.setBounds((int)(windowWeight*0.40), (int)(windowHeight*0.455), (int)(windowWeight*0.27), (int)(windowHeight*0.038));
+        JT_username1.setBounds((int) (windowWeight * 0.40), (int) (windowHeight * 0.455), (int) (windowWeight * 0.27), (int) (windowHeight * 0.038));
         JT_username1.setFont(font);
-        JL_password1.setBounds((int)(windowWeight*0.24), (int)(windowHeight*0.5), (int)(windowWeight*0.125), (int)(windowHeight*0.03));
+        JL_password1.setBounds((int) (windowWeight * 0.24), (int) (windowHeight * 0.5), (int) (windowWeight * 0.125), (int) (windowHeight * 0.03));
         JL_password1.setFont(font);
-        JT_password1.setBounds((int)(windowWeight*0.40), (int)(windowHeight*0.5), (int)(windowWeight*0.27), (int)(windowHeight*0.038));
+        JT_password1.setBounds((int) (windowWeight * 0.40), (int) (windowHeight * 0.5), (int) (windowWeight * 0.27), (int) (windowHeight * 0.038));
         JT_password1.setFont(font);
-        JL_verPsw.setBounds((int)(windowWeight*0.24), (int)(windowHeight*0.546), (int)(windowWeight*0.2), (int)(windowHeight*0.03));
+        JL_verPsw.setBounds((int) (windowWeight * 0.24), (int) (windowHeight * 0.546), (int) (windowWeight * 0.2), (int) (windowHeight * 0.03));
         JL_verPsw.setFont(font);
-        JT_verPsw.setBounds((int)(windowWeight*0.40), (int)(windowHeight*0.546), (int)(windowWeight*0.27), (int)(windowHeight*0.038));
+        JT_verPsw.setBounds((int) (windowWeight * 0.40), (int) (windowHeight * 0.546), (int) (windowWeight * 0.27), (int) (windowHeight * 0.038));
         JT_verPsw.setFont(font);
-        JL_checkcode.setBounds((int)(windowWeight*0.24), (int)(windowHeight*0.593), (int)(windowWeight*0.2), (int)(windowHeight*0.03));
+        JL_checkcode.setBounds((int) (windowWeight * 0.24), (int) (windowHeight * 0.593), (int) (windowWeight * 0.2), (int) (windowHeight * 0.03));
         JL_checkcode.setFont(font);
-        JT_checkcode.setBounds((int)(windowWeight*0.40), (int)(windowHeight*0.593), (int)(windowWeight*0.127), (int)(windowHeight*0.038));
+        JT_checkcode.setBounds((int) (windowWeight * 0.40), (int) (windowHeight * 0.593), (int) (windowWeight * 0.127), (int) (windowHeight * 0.038));
         JT_checkcode.setFont(font);
 
         //验证码
-        JB_codePic.setBounds((int)(windowWeight*0.59), (int)(windowHeight*0.593), (int)(windowWeight*0.23), (int)(windowHeight*0.047));
+        JB_codePic.setBounds((int) (windowWeight * 0.59), (int) (windowHeight * 0.593), (int) (windowWeight * 0.23), (int) (windowHeight * 0.047));
         /**
          * 点击按钮生成验证码图片
          */
         JB_codePic.addActionListener(new ActionListener() {
 
             StringBuffer codePicName;
+
             @Override
             public void actionPerformed(ActionEvent e) {
 
                 try {
                     GlobalCodeMgr.getInstance().setCode(CodeUtil.run());
-                    JB_codePic.setIcon(new ImageIcon(codePathName+"\\"+GlobalCodeMgr.getInstance().getCode()+".jpg"));
+                    JB_codePic.setIcon(new ImageIcon(codePathName + "\\" + GlobalCodeMgr.getInstance().getCode() + ".jpg"));
                     JT_checkcode.setText("");
                 } catch (Exception e1) {
                     e1.printStackTrace();
@@ -204,7 +208,7 @@ public class LoginFrame {
             }
         });
 
-        JB_abandan.setBounds((int)(windowWeight*0.25), (int)(windowHeight*0.67), (int)(windowWeight*0.17), (int)(windowHeight*0.053));
+        JB_abandan.setBounds((int) (windowWeight * 0.25), (int) (windowHeight * 0.67), (int) (windowWeight * 0.17), (int) (windowHeight * 0.053));
         JB_abandan.setFont(font);
         JB_abandan.setBackground(Color.white);
 
@@ -218,7 +222,7 @@ public class LoginFrame {
             }
         });
 
-        JB_registe1.setBounds((int)(windowWeight*0.65),  (int)(windowHeight*0.67), (int)(windowWeight*0.17), (int)(windowHeight*0.053));
+        JB_registe1.setBounds((int) (windowWeight * 0.65), (int) (windowHeight * 0.67), (int) (windowWeight * 0.17), (int) (windowHeight * 0.053));
         JB_registe1.setBackground(Color.white);
         JB_registe1.setFont(font);
         /**
@@ -231,7 +235,7 @@ public class LoginFrame {
                 String password = new String(JT_password1.getPassword()).trim();
                 String verPsw = new String(JT_verPsw.getPassword()).trim();
                 String code = JT_checkcode.getText().trim();
-                System.out.println("用户名："+username);
+                System.out.println("用户名：" + username);
 
                 /**
                  * 用户名：4到16位（字母，数字，下划线，减号）
@@ -240,31 +244,31 @@ public class LoginFrame {
                 String reg_username = "^[a-zA-Z0-9_-]{4,16}$";
                 String reg_password = "^.{4,20}$";
 
-                if(!username.matches(reg_username)){
-                    JOptionPane.showMessageDialog(null,"用户名格式不对！","提醒",JOptionPane.PLAIN_MESSAGE);
+                if (!username.matches(reg_username)) {
+                    JOptionPane.showMessageDialog(null, "用户名格式不对！", "提醒", JOptionPane.PLAIN_MESSAGE);
                     return;
                 }
-                if(!password.matches(reg_password)){
-                    JOptionPane.showMessageDialog(null,"密码长度至少4位！","提醒",JOptionPane.PLAIN_MESSAGE);
+                if (!password.matches(reg_password)) {
+                    JOptionPane.showMessageDialog(null, "密码长度至少4位！", "提醒", JOptionPane.PLAIN_MESSAGE);
                     return;
 
                 }
-                if(!password.equals(verPsw)){
+                if (!password.equals(verPsw)) {
                     System.out.println("两次密码输入不一致");
-                    JOptionPane.showMessageDialog(null,"两次密码输入不一致！","提醒",JOptionPane.PLAIN_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "两次密码输入不一致！", "提醒", JOptionPane.PLAIN_MESSAGE);
 
                     JT_password1.setText("");
                     JT_verPsw.setText("");
                     return;
                 }
-                System.out.println("验证码为"+GlobalCodeMgr.getInstance().getCode());
+                System.out.println("验证码为" + GlobalCodeMgr.getInstance().getCode());
                 //判断验证码是否正确
-                if (!(GlobalCodeMgr.getInstance().getCode().toString()).equalsIgnoreCase(code)){
+                if (!(GlobalCodeMgr.getInstance().getCode().toString()).equalsIgnoreCase(code)) {
                     System.out.println("验证码不一致");
-                    JOptionPane.showMessageDialog(null,"验证码不正确！","提醒",JOptionPane.PLAIN_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "验证码不正确！", "提醒", JOptionPane.PLAIN_MESSAGE);
                     try {
                         GlobalCodeMgr.getInstance().setCode(CodeUtil.run());
-                        JB_codePic.setIcon(new ImageIcon(codePathName+"\\"+GlobalCodeMgr.getInstance().getCode()+".jpg"));
+                        JB_codePic.setIcon(new ImageIcon(codePathName + "\\" + GlobalCodeMgr.getInstance().getCode() + ".jpg"));
                         JT_checkcode.setText("");
                     } catch (Exception e1) {
                         e1.printStackTrace();
@@ -276,17 +280,17 @@ public class LoginFrame {
                  * 注册
                  */
                 boolean flag = userService.regist(username, password);
-                if(flag){
-                    JOptionPane.showMessageDialog(null,"注册成功，请登录！","提醒",JOptionPane.PLAIN_MESSAGE);
+                if (flag) {
+                    JOptionPane.showMessageDialog(null, "注册成功，请登录！", "提醒", JOptionPane.PLAIN_MESSAGE);
                     //注册成功：回到登录页面，并清空注册页面文本框
                     frame.setSize((int) (WindowXY.getWidth() * (0.262)), (int) (WindowXY.getHeight() * (0.27)));
                     clean();
-                }else{
+                } else {
                     /**
                      * 注册失败：用户名重复
                      * 验证码要刷新
                      */
-                    JOptionPane.showMessageDialog(null,"该用户名已存在！","提醒",JOptionPane.PLAIN_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "该用户名已存在！", "提醒", JOptionPane.PLAIN_MESSAGE);
                     try {
                         GlobalCodeMgr.getInstance().setCode(CodeUtil.run());
                     } catch (Exception e1) {
@@ -339,7 +343,7 @@ public class LoginFrame {
         // 设定窗口大小
         frame.setSize((int) (WindowXY.getWidth() * (0.262)), (int) (WindowXY.getHeight() * (para)));
         //设置窗口居中
-        frame.setLocation((int)(WindowXY.getWidth()*0.36),(int)(WindowXY.getHeight()*0.2));
+        frame.setLocation((int) (WindowXY.getWidth() * 0.36), (int) (WindowXY.getHeight() * 0.2));
         frame.setResizable(false);
         frame.setVisible(true);
     }
@@ -347,7 +351,7 @@ public class LoginFrame {
     /**
      * 清空文本框
      */
-    public void clean(){
+    public void clean() {
         JT_username1.setText("");
         JT_password1.setText("");
         JT_verPsw.setText("");

@@ -43,8 +43,7 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
     }
 
     /**
-     * 保存用户
-     *
+     * 保存用户--用于注册
      * @param user
      * @return
      */
@@ -62,6 +61,25 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
             return false;
         }
         return true;
+    }
+
+    /**
+     * 更新用户签名
+     *
+     * @param user
+     * @return
+     */
+    @Override
+    public boolean updateSign(User user) {
+        HibernateTemplate template = this.getHibernateTemplate();
+        try {
+            User user1 = template.get(User.class, user.getUserId());
+            user1.setSignStr(user.getSignStr());
+            template.update(user1);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     /**

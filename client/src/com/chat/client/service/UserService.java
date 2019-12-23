@@ -12,4 +12,6 @@ public interface UserService {
     User login(String username, String password);
 
     void saveUser(User user);
+
+    void updateSign(User user);
 }

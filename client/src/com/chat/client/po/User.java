@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.io.Serializable;
+
 /**
  * @author Ranger
  * @create 2019-12-18 14:01
@@ -11,7 +13,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class User {
+public class User implements Serializable {
     private Integer userId;
     private String username;
     private String password;
@@ -27,4 +29,5 @@ public class User {
         this.headUrl = headUrl;
         this.signStr = signStr;
     }
+
 }

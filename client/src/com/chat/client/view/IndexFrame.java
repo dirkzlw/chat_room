@@ -135,12 +135,13 @@ public class IndexFrame extends PlainDocument {
         frame.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if(signField.isEnabled()){
+                if(signField.isEditable()){
                     signField.setEditable(false);
                     signField.getCaret().setVisible(false);
                     user.setSignStr(signField.getText().trim());
                     System.out.println("userService = " + userService);
-                    userService.saveUser(user);
+                    userService.updateSign(user);
+
                 }
             }
         });
