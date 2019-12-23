@@ -139,6 +139,13 @@ public class IndexFrame extends PlainDocument {
          */
         //从数据库中获取所有用户
         List<User> userList = userService.findAllUser();
+        //遍历删除当前用户
+        for (int i = 0; i < userList.size(); i++) {
+            if(user.getUsername().equals(userList.get(i).getUsername())){
+                userList.remove(i);
+                i--;
+            }
+        }
         //标签
         JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
         tabbedPane.setBounds(20, (int) (0.145 * height), (int) (0.21 * width), (int) (0.55 * height));
@@ -161,7 +168,6 @@ public class IndexFrame extends PlainDocument {
         JPanel panel1_0 = new JPanel();
         panel1_0.setPreferredSize(new Dimension((int) (0.21 * width), friendList.length * 70));
         panel1_0.setLayout(null);
-
         for (int i = 0; i < headList.length; i++) {
             headImg[i].setImage(headImg[i].getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
             headList[i] = new JLabel(headImg[i]);
@@ -181,22 +187,35 @@ public class IndexFrame extends PlainDocument {
         panel1.add(scrollPane);
 
         //添加群聊
-
         JPanel panel2 = new JPanel();
         panel2.setBounds(20, (int) (0.145 * height), (int) (0.21 * width) + 20, (int) (0.55 * height));
         tabbedPane.add("群聊", panel2);
         panel2.setLayout(null);
-        //群聊列表
-        JLabel[] roomList = new JLabel[10];
+        //群头像
         JPanel panel2_0 = new JPanel();
-        panel2_0.setPreferredSize(new Dimension((int) (0.21 * width), friendList.length * 70));
+        ImageIcon qunImg = new ImageIcon("img/head/qun.jpg");
+        JLabel qunLabel = new JLabel();
+        qunLabel.setBounds(0, -16, (int) (0.045 * width), (int) (0.078 * height));
+        qunImg.setImage(qunImg.getImage().getScaledInstance(50,50, Image.SCALE_DEFAULT));
+        qunLabel.setIcon(qunImg);
+        panel2_0.add(qunLabel);
+        //群聊列表
+        JLabel[] roomList = new JLabel[1];
+        panel2_0.setPreferredSize(new Dimension((int) (0.21 * width), roomList.length * 70));
         panel2_0.setLayout(null);
-        for (int i = 0; i < friendList.length; i++) {
-//            roomList[i] = new JLabel("相亲相爱一家人" + i);
-//            roomList[i].setFont(new Font("System", Font.PLAIN, 26));
-//            roomList[i].setBounds(50, i * 70, (int) (0.2 * width), 70);
-//            panel2_0.add(roomList[i]);
+        for (int i = 0; i < roomList.length; i++) {
+            roomList[i] = new JLabel("对方正在输入...");
+            roomList[i].setFont(new Font("System", Font.PLAIN, 26));
+            roomList[i].setBounds(60, i * 70, (int) (0.2 * width), 70);
+            panel2_0.add(roomList[i]);
         }
+        //打开群聊窗口
+        roomList[0].addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                new ChatFrame("群聊",userList);
+            }
+        });
         JScrollPane scrollPane2 = new JScrollPane(panel2_0);
         scrollPane2.setBounds(0, 0, (int) (0.21 * width), (int) (0.55 * height));
         //设置横向滚动条不可见
@@ -213,5 +232,4 @@ public class IndexFrame extends PlainDocument {
 
         new IndexFrame(user);
     }
-
 }

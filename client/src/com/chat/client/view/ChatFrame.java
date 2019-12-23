@@ -1,5 +1,6 @@
 package com.chat.client.view;
 
+import com.chat.client.po.User;
 import com.chat.client.utils.WindowXY;
 
 import javax.imageio.ImageIO;
@@ -15,6 +16,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -30,7 +32,7 @@ public class ChatFrame {
 
     public ChatFrame() {}
 
-    public ChatFrame(String title) {
+    public ChatFrame(String title, List<User> userList) {
 
         // 设置窗口外观
         try {
@@ -137,24 +139,6 @@ public class ChatFrame {
                 File chooseFile;
                 if (resultVal == fileChooser.APPROVE_OPTION) { // 判断是否确定选择文件
                     chooseFile = fileChooser.getSelectedFile(); // 返回所选择的的文件
-//                    try {
-//                        reader = new BufferedReader(new FileReader(chooseFile)); // 创建输入流
-//                        textIn.setText(""); // 清空代码区
-//                        // 读取整个文件
-//                        String line;
-//                        while ((line = reader.readLine()) != null) {
-//                            textIn.append(line + "\n"); // 按行写入代码区
-//                        }
-//                    } catch (Exception e1) {
-//                        e1.printStackTrace();
-//                    } finally {
-//                        try {
-//                            if (reader != null) {
-//                                reader.close(); // 关闭流
-//                            }
-//                        } catch (IOException e1) {
-//                        }
-//                    }
                     System.out.println("导入文件:" + chooseFile.getPath());
                 } else {
                     System.out.println("没有导入");
@@ -209,21 +193,9 @@ public class ChatFrame {
         panel4.setBounds((int) (0.782 * 0.6 * width), (int) (0.633 * 0.7 * height), (int) (0.2285 * 0.6 * width), (int) (0.324 * 0.7 * height));
         frame.add(panel4);
         JTextArea areaList = new JTextArea();
-        areaList.append("[在线] 罗伯史塔克1\n");
-        areaList.append("[在线] 罗伯史塔克2\n");
-        areaList.append("[在线] 罗伯史塔克3\n");
-        areaList.append("[在线] 罗伯史塔克4\n");
-        areaList.append("[在线] 罗伯史塔克5\n");
-        areaList.append("[离线] 罗伯史塔克6\n");
-        areaList.append("[离线] 罗伯史塔克7\n");
-        areaList.append("[离线] 罗伯史塔克8\n");
-        areaList.append("[离线] 罗伯史塔克0\n");
-        areaList.append("[离线] 罗伯史塔克9\n");
-        areaList.append("[离线] 罗伯史塔克9\n");
-        areaList.append("[离线] 罗伯史塔克9\n");
-        areaList.append("[离线] 罗伯史塔克9\n");
-        areaList.append("[离线] 罗伯史塔克9\n");
-        areaList.append("[离线] 罗伯史塔克9\n");
+        for (User user : userList) {
+            areaList.append("  [离线]  "+user.getUsername()+"\n");
+        }
         areaList.setFont(new Font("System", Font.PLAIN, 18));
         areaList.setBounds(20, 1, (int) (0.2285 * 0.6 * width) - 20, (int) (0.32 * 0.7 * height));
         // 添加滚动条
@@ -233,9 +205,6 @@ public class ChatFrame {
         panel4.add(scrollPanel3);
     }
 
-    public static void main(String[] args) {
-        new ChatFrame("群聊");
-    }
 }
 
 class TuFrame {
