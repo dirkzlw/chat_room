@@ -1,10 +1,7 @@
 package com.chat.server.socket;
 
-import com.chat.server.thread.ServerThread;
 import com.chat.server.utils.ChatManager;
-import com.chat.server.utils.DataUtils;
 
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;

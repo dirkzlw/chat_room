@@ -32,6 +32,7 @@ public class IndexFrame extends PlainDocument {
 
     private JFrame frame;
     private int limit;  //限制的长度
+    private ChatFrame chatFrame;
 
     public IndexFrame(){}
 
@@ -213,7 +214,15 @@ public class IndexFrame extends PlainDocument {
         roomList[0].addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                new ChatFrame("群聊",user,userList);
+                if(null != chatFrame){
+                    if(chatFrame.isClose()){
+                        chatFrame = new ChatFrame("群聊", user, userList,chatFrame);
+                    }
+                    chatFrame.getFrame().setAlwaysOnTop(true);
+                    chatFrame.getFrame().setAlwaysOnTop(false);
+                }else {
+                    chatFrame = new ChatFrame("群聊", user, userList,chatFrame);
+                }
             }
         });
         JScrollPane scrollPane2 = new JScrollPane(panel2_0);
@@ -225,7 +234,7 @@ public class IndexFrame extends PlainDocument {
     }
 
     public static void main(String[] args) {
-        User user = new User("dirk", null,
+        User user = new User("main", null,
                 "39.107.249.220:888/img/scul.png",
                 "留下您的个性签名！");
         user.setUserId(1);

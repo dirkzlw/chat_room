@@ -32,7 +32,9 @@ public class ChatManager {
             //加入客户端集合
             DataUtils.clientList.add(client);
             synchronized (DataUtils.online){
-                ChatManager.sendToClients(clientName + "已连接..." + "当前人数：" + ++DataUtils.online);
+                String msg = "系统提示  " + DateUtils.getDate()+"\n    · "
+                        + clientName + "已连接..." + "当前人数：" + ++DataUtils.online;
+                ChatManager.sendToClients(msg);
             }
             //将client加入新线程
             new ServerThread(client, clientName).start();

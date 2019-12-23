@@ -3,6 +3,7 @@ package com.chat.client.view;
 import com.chat.client.client.Client;
 import com.chat.client.po.User;
 import com.chat.client.utils.WindowXY;
+import lombok.Getter;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -25,15 +26,21 @@ import java.util.TimerTask;
  */
 public class ChatFrame {
 
+    @Getter
     private JFrame frame;
     private TuFrame tuFrame;
     private Timer timer;
-    private JTextArea textShow = new JTextArea();;
+    private JTextArea textShow = new JTextArea();
+    @Getter
+    private boolean isClose = false;
 
-    public ChatFrame() {}
 
-    public ChatFrame(String title,User user, List<User> userList) {
-        Client client = new Client(user.getUsername(),textShow);
+    public ChatFrame() {
+    }
+
+    public ChatFrame(String title, User user, List<User> userList, ChatFrame chatFrame) {
+
+        Client client = new Client(user.getUsername(), textShow);
         // 设置窗口外观
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -62,6 +69,10 @@ public class ChatFrame {
             public void windowClosing(WindowEvent e) {
                 //窗口关闭，停止定时器
                 timer.cancel();
+                //停止client
+                client.send("@exit^A^A^A");
+                // 将当前对象置空
+                isClose = true;
             }
         });
 
@@ -120,7 +131,7 @@ public class ChatFrame {
         tuLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if(null == tuFrame || null ==tuFrame.getFrame()){
+                if (null == tuFrame || null == tuFrame.getFrame()) {
                     Point p = MouseInfo.getPointerInfo().getLocation();
                     tuFrame = new TuFrame((int) p.getX(), (int) p.getY() - 130);
                 }
@@ -195,7 +206,7 @@ public class ChatFrame {
         frame.add(panel4);
         JTextArea areaList = new JTextArea();
         for (User u : userList) {
-            areaList.append("  [离线]  "+u.getUsername()+"\n");
+            areaList.append("  [离线]  " + u.getUsername() + "\n");
         }
         areaList.setFont(new Font("System", Font.PLAIN, 18));
         areaList.setBounds(20, 1, (int) (0.2285 * 0.6 * width) - 20, (int) (0.32 * 0.7 * height));
