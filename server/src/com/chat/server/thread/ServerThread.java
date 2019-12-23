@@ -10,6 +10,7 @@ import java.net.Socket;
 import java.net.SocketException;
 
 /**
+ * 监听客户端发送的消息，并返回
  * @author Ranger
  * @create 2019-12-17 20:48
  */
@@ -18,8 +19,7 @@ public class ServerThread extends Thread {
     private Socket client;
     private String clientName;
 
-    public ServerThread() {
-    }
+    public ServerThread() {}
 
     public ServerThread(Socket socket, String name) {
         this.client = socket;
@@ -38,6 +38,7 @@ public class ServerThread extends Thread {
                             synchronized (DataUtils.online) {
                                 String msg = "系统提示  " + DateUtils.getDate() + "\n    · "
                                         + clientName + "已退出群聊..." + "当前人数：" + --DataUtils.online;
+                                client.close();
                                 ChatManager.sendToClients(msg);
                             }
                             break;

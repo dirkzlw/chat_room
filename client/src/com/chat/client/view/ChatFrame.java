@@ -33,14 +33,15 @@ public class ChatFrame {
     private JTextArea textShow = new JTextArea();
     @Getter
     private boolean isClose = false;
-
+    private JLabel jlist = new JLabel("群成员", JLabel.CENTER);
+    private JTextArea memberList = new JTextArea();
 
     public ChatFrame() {
     }
 
     public ChatFrame(String title, User user, List<User> userList, ChatFrame chatFrame) {
 
-        Client client = new Client(user.getUsername(), textShow);
+        Client client = new Client(user.getUsername(), textShow, jlist, memberList, userList);
         // 设置窗口外观
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -190,7 +191,6 @@ public class ChatFrame {
         panel3.setBackground(Color.white);
         panel3.setBounds((int) (0.782 * 0.6 * width), (int) (0.588 * 0.7 * height), (int) (0.2285 * 0.6 * width), (int) (0.045 * 0.7 * height));
         //输出条目
-        JLabel jlist = new JLabel("群成员(3/5)", JLabel.CENTER);
         jlist.setFont(new Font("System", Font.BOLD, 23));
         jlist.setBounds(0, 1, (int) (0.2285 * 0.6 * width), 35);
         panel3.add(jlist);
@@ -204,14 +204,10 @@ public class ChatFrame {
         panel4.setBackground(Color.white);
         panel4.setBounds((int) (0.782 * 0.6 * width), (int) (0.633 * 0.7 * height), (int) (0.2285 * 0.6 * width), (int) (0.324 * 0.7 * height));
         frame.add(panel4);
-        JTextArea areaList = new JTextArea();
-        for (User u : userList) {
-            areaList.append("  [离线]  " + u.getUsername() + "\n");
-        }
-        areaList.setFont(new Font("System", Font.PLAIN, 18));
-        areaList.setBounds(20, 1, (int) (0.2285 * 0.6 * width) - 20, (int) (0.32 * 0.7 * height));
+        memberList.setFont(new Font("System", Font.PLAIN, 18));
+        memberList.setBounds(20, 1, (int) (0.2285 * 0.6 * width) - 20, (int) (0.32 * 0.7 * height));
         // 添加滚动条
-        JScrollPane scrollPanel3 = new JScrollPane(areaList);
+        JScrollPane scrollPanel3 = new JScrollPane(memberList);
         scrollPanel3.setBounds(20, 1, (int) (0.2285 * 0.6 * width) - 20, (int) (0.32 * 0.7 * height));
         scrollPanel3.setBorder(null); // 去除边框
         panel4.add(scrollPanel3);
