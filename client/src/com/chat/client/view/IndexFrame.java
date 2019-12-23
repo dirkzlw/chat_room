@@ -1,5 +1,6 @@
 package com.chat.client.view;
 
+import com.chat.client.dao.UserDao;
 import com.chat.client.po.User;
 import com.chat.client.service.UserService;
 import com.chat.client.utils.FtpUtils;
@@ -18,6 +19,7 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * @author Ranger
@@ -70,22 +72,7 @@ public class IndexFrame extends PlainDocument {
         frame.setLayout(null); // 布局设置为空
 
         //添加头像--先从本地读取，未读到根据url下载到本地
-        String[] split = user.getHeadUrl().split("/");
-        String suf = split[split.length-1].split("\\.")[1];
-        File f = new File("img/head/" + user.getUsername() + "." + suf);
-        if (!f.exists()) {
-            boolean b = FtpUtils.downFile("39.107.249.220",
-                    21,
-                    "html_fs",
-                    "html_fs_pwd",
-                    "img",
-                    split[split.length - 1],
-                    "img/head",
-                    user.getUsername() + "." + suf);
-            if(!b){
-                System.out.println("下载头像失败！");
-            }
-        }
+        String suf = FtpUtils.readHeadImg(user);
         ImageIcon headIcon = new ImageIcon("img/head/" + user.getUsername() + "." + suf);
 
         JLabel sculLabel = new JLabel();
@@ -150,6 +137,8 @@ public class IndexFrame extends PlainDocument {
         /**
          * 好友列表
          */
+        //从数据库中获取所有用户
+        List<User> userList = userService.findAllUser();
         //标签
         JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
         tabbedPane.setBounds(20, (int) (0.145 * height), (int) (0.21 * width), (int) (0.55 * height));
@@ -160,13 +149,14 @@ public class IndexFrame extends PlainDocument {
         tabbedPane.add("我的好友", panel1);
         panel1.setLayout(null);
         //头像列表
-        ImageIcon[] headImg = new ImageIcon[10];
-        for (int i = 0; i < headImg.length; i++) {
-            headImg[i] = new ImageIcon("img/head/h" + i + ".jpg");
+        ImageIcon[] headImg = new ImageIcon[userList.size()];
+        for (int i = 0; i < userList.size(); i++) {
+            suf = FtpUtils.readHeadImg(userList.get(i));
+            headImg[i] = new ImageIcon("img/head/" + userList.get(i).getUsername()+"." + suf);
         }
-        JLabel[] headList = new JLabel[10];
+        JLabel[] headList = new JLabel[userList.size()];
         //好友列表
-        JLabel[] friendList = new JLabel[10];
+        JLabel[] friendList = new JLabel[userList.size()];
         //面板1_0，用来装滚动条，里面存好友列表
         JPanel panel1_0 = new JPanel();
         panel1_0.setPreferredSize(new Dimension((int) (0.21 * width), friendList.length * 70));
@@ -179,7 +169,7 @@ public class IndexFrame extends PlainDocument {
             panel1_0.add(headList[i]);
         }
         for (int i = 0; i < friendList.length; i++) {
-            friendList[i] = new JLabel("罗伯·史塔克" + i);
+            friendList[i] = new JLabel(userList.get(i).getUsername());
             friendList[i].setFont(new Font("System", Font.PLAIN, 26));
             friendList[i].setBounds(60, i * 70, (int) (0.2 * width), 70);
             panel1_0.add(friendList[i]);
@@ -202,10 +192,10 @@ public class IndexFrame extends PlainDocument {
         panel2_0.setPreferredSize(new Dimension((int) (0.21 * width), friendList.length * 70));
         panel2_0.setLayout(null);
         for (int i = 0; i < friendList.length; i++) {
-            roomList[i] = new JLabel("相亲相爱一家人" + i);
-            roomList[i].setFont(new Font("System", Font.PLAIN, 26));
-            roomList[i].setBounds(50, i * 70, (int) (0.2 * width), 70);
-            panel2_0.add(roomList[i]);
+//            roomList[i] = new JLabel("相亲相爱一家人" + i);
+//            roomList[i].setFont(new Font("System", Font.PLAIN, 26));
+//            roomList[i].setBounds(50, i * 70, (int) (0.2 * width), 70);
+//            panel2_0.add(roomList[i]);
         }
         JScrollPane scrollPane2 = new JScrollPane(panel2_0);
         scrollPane2.setBounds(0, 0, (int) (0.21 * width), (int) (0.55 * height));

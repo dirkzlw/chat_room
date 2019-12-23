@@ -1,5 +1,6 @@
 package com.chat.client.utils;
 
+import com.chat.client.po.User;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
@@ -17,6 +18,26 @@ import java.io.OutputStream;
  * @create 2019-12-15 11:52
  */
 public class FtpUtils {
+
+    public static String readHeadImg(User user){
+        String[] split = user.getHeadUrl().split("/");
+        String suf = split[split.length-1].split("\\.")[1];
+        File f = new File("img/head/" + user.getUsername() + "." + suf);
+        if (!f.exists()) {
+            boolean b = FtpUtils.downFile("39.107.249.220",
+                    21,
+                    "html_fs",
+                    "html_fs_pwd",
+                    "img",
+                    split[split.length - 1],
+                    "img/head",
+                    user.getUsername() + "." + suf);
+            if(!b){
+                System.out.println("下载头像失败！");
+            }
+        }
+        return suf;
+    }
 
     /**
      * Description: 从FTP服务器下载文件

@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * @author Ranger
  * @create 2019-12-18 14:46
@@ -44,5 +46,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateSign(User user) {
         userDao.updateSign(user);
+    }
+
+    /**
+     * 获取所有用户
+     * @return
+     */
+    @Override
+    public List<User> findAllUser() {
+        return userDao.findAllUser();
     }
 }

@@ -24,6 +24,15 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
 
     }
 
+    /**
+     * 获取所有用户
+     * @return
+     */
+    @Override
+    public List<User> findAllUser() {
+        HibernateTemplate template = this.getHibernateTemplate();
+        return (List<User>) template.find("from User",null);
+    }
 
     /**
      * 检查用户名是否已被注册
