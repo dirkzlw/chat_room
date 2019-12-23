@@ -5,6 +5,7 @@ import com.chat.client.service.UserService;
 import com.chat.client.utils.CodeUtil;
 import com.chat.client.utils.GlobalCodeMgr;
 import com.chat.client.utils.WindowXY;
+import com.sun.awt.AWTUtilities;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -13,6 +14,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -40,6 +43,11 @@ public class LoginFrame {
      * codePicName:文件名
      */
     public void initFrame(double para) {
+
+        JLabel backgroud = new JLabel(new ImageIcon("img/surface/backgroud.jpg"));
+        backgroud.setBounds(0, 0, (int)( WindowXY.getWidth() * (0.262)),(int) (WindowXY.getHeight() * (0.6)));
+
+
         String codePathName = "img/code";
         //设置字体
         Font font = new Font("System", Font.PLAIN, 18);
@@ -51,6 +59,7 @@ public class LoginFrame {
         JPanel registPanel = new JPanel();
         JLabel JL_username = new JLabel("用户名");
         JLabel JL_password = new JLabel("密  码");
+        loginPanel.setOpaque(false);
 
         JTextField JT_username = new JTextField();
         JPasswordField JT_password = new JPasswordField();
@@ -138,9 +147,11 @@ public class LoginFrame {
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
-                    //变长：1、长度改变 2、验证码变化
+                    //变长：1、长度改变 2、验证码变化 3、弹框提示账号密码格式
                     frame.setSize((int) (WindowXY.getWidth() * (0.262)), (int) (WindowXY.getHeight() * (0.6)));
-                    JB_codePic.setIcon(new ImageIcon(codePathName+"\\"+codePicName+".jpg"));
+                    JB_codePic.setIcon(new ImageIcon(codePathName+"\\"+GlobalCodeMgr.getInstance().getCode()+".jpg"));
+                    JOptionPane.showMessageDialog(null,"用户名：4到16位（字母，数字，下划线，减号）\n" +
+                            "                 密码：长度为4-20的所有字符","注册格式提示",JOptionPane.PLAIN_MESSAGE);
                 }else{
                     frame.setSize((int) (WindowXY.getWidth() * (0.262)), (int) (WindowXY.getHeight() * (0.27)));
                 }
@@ -151,6 +162,8 @@ public class LoginFrame {
         registPanel.setBorder(BorderFactory.createTitledBorder("用户注册"));
         registPanel.setLayout(null);
         registPanel.setBounds((int)(windowWeight*0.095), (int)(windowHeight*0.413), (int)(windowWeight*0.8), (int)(windowHeight*0.38));
+        //设置面板为透明
+        registPanel.setOpaque(false);
 
         JL_username1.setBounds((int)(windowWeight*0.24), (int)(windowHeight*0.458), (int)(windowWeight*0.125), (int)(windowHeight*0.03));
         JL_username1.setFont(font);
@@ -194,6 +207,7 @@ public class LoginFrame {
         JB_abandan.setBounds((int)(windowWeight*0.25), (int)(windowHeight*0.67), (int)(windowWeight*0.17), (int)(windowHeight*0.053));
         JB_abandan.setFont(font);
         JB_abandan.setBackground(Color.white);
+
         /**
          * 清空文本框内容
          */
@@ -263,7 +277,7 @@ public class LoginFrame {
                  */
                 boolean flag = userService.regist(username, password);
                 if(flag){
-                    JOptionPane.showMessageDialog(null,"注册成功！","提醒",JOptionPane.PLAIN_MESSAGE);
+                    JOptionPane.showMessageDialog(null,"注册成功，请登录！","提醒",JOptionPane.PLAIN_MESSAGE);
                     //注册成功：回到登录页面，并清空注册页面文本框
                     frame.setSize((int) (WindowXY.getWidth() * (0.262)), (int) (WindowXY.getHeight() * (0.27)));
                     clean();
@@ -272,7 +286,12 @@ public class LoginFrame {
                      * 注册失败：用户名重复
                      * 验证码要刷新
                      */
-                    JOptionPane.showMessageDialog(null,"用户名重复！","提醒",JOptionPane.PLAIN_MESSAGE);
+                    JOptionPane.showMessageDialog(null,"该用户名已存在！","提醒",JOptionPane.PLAIN_MESSAGE);
+                    try {
+                        GlobalCodeMgr.getInstance().setCode(CodeUtil.run());
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
+                    }
                 }
             }
         });
@@ -312,6 +331,8 @@ public class LoginFrame {
         frame.add(JB_abandan);
         frame.add(JB_registe1);
         frame.add(registPanel);
+
+        frame.getContentPane().add(backgroud);
 
         // 设定默认为关闭
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
