@@ -213,7 +213,7 @@ public class IndexFrame extends PlainDocument {
         roomList[0].addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                new ChatFrame("群聊",userList);
+                new ChatFrame("群聊",user,userList);
             }
         });
         JScrollPane scrollPane2 = new JScrollPane(panel2_0);

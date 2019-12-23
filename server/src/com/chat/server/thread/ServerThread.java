@@ -31,9 +31,11 @@ public class ServerThread extends Thread {
             DataInputStream dis = new DataInputStream(client.getInputStream());
             while (true) {
                 try {
-                    String line = dis.readUTF();
-//                    System.out.println(clientName + ":" + line);
-                    ChatManager.sendToClients(clientName + ":" + line);
+                    synchronized (this){
+                        String line = dis.readUTF();
+                        System.out.println(clientName + ":" + line);
+                        ChatManager.sendToClients(clientName + ":" + line);
+                    }
                 } catch (SocketException e) {
 //                    System.out.println(clientName + "已退出群聊..." + "当前人数：" + --DataUtils.online);
                     synchronized (DataUtils.online){

@@ -1,5 +1,6 @@
 package com.chat.client.view;
 
+import com.chat.client.client.Client;
 import com.chat.client.po.User;
 import com.chat.client.utils.WindowXY;
 
@@ -11,10 +12,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.List;
 import java.util.Timer;
@@ -29,11 +28,12 @@ public class ChatFrame {
     private JFrame frame;
     private TuFrame tuFrame;
     private Timer timer;
+    private JTextArea textShow = new JTextArea();;
 
     public ChatFrame() {}
 
-    public ChatFrame(String title, List<User> userList) {
-
+    public ChatFrame(String title,User user, List<User> userList) {
+        Client client = new Client(user.getUsername(),textShow);
         // 设置窗口外观
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -74,10 +74,9 @@ public class ChatFrame {
         panel1.setBounds(1, 1, (int) (0.78 * 0.6 * width), (int) (0.585 * 0.7 * height));
         panel1.setBorder(BorderFactory.createEtchedBorder());
         // 添加文本框
-        JTextArea textShow = new JTextArea();
         textShow.setFont(font);
         textShow.setLineWrap(true); // 自动换行
-//        textShow.setEditable(false);
+        textShow.setEditable(false);
         // 添加滚动条
         JScrollPane scrollPanel1 = new JScrollPane(textShow);
         scrollPanel1.setBounds(10, 2, (int) (0.78 * 0.6 * width) - 10, (int) (0.585 * 0.7 * height) - 5);
@@ -108,7 +107,9 @@ public class ChatFrame {
         sendBtn.setBackground(Color.white);
         sendBtn.setBounds((int) (0.78 * 0.6 * width) - 113, (int) (0.324 * 0.7 * height) - 52, 100, 40);
         sendBtn.addActionListener(e -> {
-
+            String inLine = textIn.getText();
+            client.send(inLine);
+            textIn.setText("");
         });
         panel2.add(sendBtn);
         frame.add(panel2);
@@ -193,8 +194,8 @@ public class ChatFrame {
         panel4.setBounds((int) (0.782 * 0.6 * width), (int) (0.633 * 0.7 * height), (int) (0.2285 * 0.6 * width), (int) (0.324 * 0.7 * height));
         frame.add(panel4);
         JTextArea areaList = new JTextArea();
-        for (User user : userList) {
-            areaList.append("  [离线]  "+user.getUsername()+"\n");
+        for (User u : userList) {
+            areaList.append("  [离线]  "+u.getUsername()+"\n");
         }
         areaList.setFont(new Font("System", Font.PLAIN, 18));
         areaList.setBounds(20, 1, (int) (0.2285 * 0.6 * width) - 20, (int) (0.32 * 0.7 * height));

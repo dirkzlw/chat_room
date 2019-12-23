@@ -7,7 +7,7 @@
 		<id name="userId" column="user_id">
 			<generator class="native"></generator>
 		</id>
-		<property name="username" column="username"/>
+		<property name="username" column="username" unique="true"/>
 		<property name="password" column="password"/>
 		<property name="headUrl" column="head_url"/>
 		<property name="signStr" column="sign_str"/>
