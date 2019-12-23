@@ -2,24 +2,13 @@ package com.chat.client.view;
 
 import com.chat.client.po.User;
 import com.chat.client.service.UserService;
-import com.chat.client.service.impl.UserServiceImpl;
 import com.chat.client.utils.FtpUtils;
 import com.chat.client.utils.WindowXY;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import javax.accessibility.AccessibleContext;
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
@@ -82,26 +71,43 @@ public class IndexFrame extends PlainDocument {
 
         //添加头像--先从本地读取，未读到根据url下载到本地
         String[] split = user.getHeadUrl().split("/");
-        File f = new File("img/head/" + split[split.length - 1]);
+        String suf = split[split.length-1].split("\\.")[1];
+        File f = new File("img/head/" + user.getUsername() + "." + suf);
         if (!f.exists()) {
-            String srcFileName = split[split.length - 1];
-            String suf = srcFileName.split("\\.")[1];
-            FtpUtils.downFile("39.107.249.220",
+            boolean b = FtpUtils.downFile("39.107.249.220",
                     21,
                     "html_fs",
                     "html_fs_pwd",
                     "img",
                     split[split.length - 1],
                     "img/head",
-                    split[split.length - 1]);
+                    user.getUsername() + "." + suf);
+            if(!b){
+                System.out.println("下载头像失败！");
+            }
         }
-        ImageIcon headIcon = new ImageIcon("img/head/" + split[split.length - 1]);
+        ImageIcon headIcon = new ImageIcon("img/head/" + user.getUsername() + "." + suf);
 
         JLabel sculLabel = new JLabel();
         sculLabel.setBounds(50, 50, (int) (0.045 * width), (int) (0.078 * height));
         headIcon.setImage(headIcon.getImage().getScaledInstance((int) (0.045 * width),
                 (int) (0.078 * height), Image.SCALE_DEFAULT));
         sculLabel.setIcon(headIcon);
+        sculLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                JFileChooser fileChooser = new JFileChooser("./"); // 文件选择器+默认路径
+                fileChooser.setFileFilter(new FileNameExtensionFilter("图片", "png","jpg","bmp","jepg")); // 选择类型
+                int resultVal = fileChooser.showOpenDialog(null); // 显示选择器
+                File chooseFile;
+                if (resultVal == fileChooser.APPROVE_OPTION) { // 判断是否确定选择文件
+                    chooseFile = fileChooser.getSelectedFile(); // 返回所选择的的文件
+                    System.out.println("导入文件:" + chooseFile.getPath());
+                } else {
+                    System.out.println("没有导入");
+                }
+            }
+        });
         frame.add(sculLabel);
 
         //添加昵称

@@ -52,6 +52,11 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
     public boolean saveUser(User user) {
         HibernateTemplate template = this.getHibernateTemplate();
         try {
+            List<User> userList = (List<User>) template.find("from User where username = ?", user.getUsername());
+            if (null != userList && userList.size() > 0) {
+                System.out.println("用户名已存在,无法保存！");
+                return false;
+            }
             template.save(user);
         } catch (Exception e) {
             return false;
