@@ -184,7 +184,6 @@ public class IndexFrame extends PlainDocument {
         //滚动条
         JScrollPane scrollPane = new JScrollPane(panel1_0);
         scrollPane.setBounds(0, 0, (int) (0.21 * width), (int) (0.55 * height));
-        //设置横向滚动条不可见
         panel1.add(scrollPane);
 
         //添加群聊
@@ -227,7 +226,6 @@ public class IndexFrame extends PlainDocument {
         });
         JScrollPane scrollPane2 = new JScrollPane(panel2_0);
         scrollPane2.setBounds(0, 0, (int) (0.21 * width), (int) (0.55 * height));
-        //设置横向滚动条不可见
         panel2.add(scrollPane2);
 
         frame.setVisible(true);

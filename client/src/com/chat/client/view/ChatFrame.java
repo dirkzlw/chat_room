@@ -32,6 +32,7 @@ public class ChatFrame {
     @Getter
     private JFrame frame;
     private TuFrame tuFrame;
+    private FlistFrame flistFrame;
     private Timer timer;
     private JTextPane textPane = new JTextPane();
     @Getter
@@ -43,7 +44,7 @@ public class ChatFrame {
     }
 
     public ChatFrame(String title, User user, List<User> userList, ChatFrame chatFrame) {
-        DataUtils.client = new Client(user.getUsername(), textPane, jlist, memberList, userList);
+//        DataUtils.client = new Client(user.getUsername(), textPane, jlist, memberList, userList);
         // 设置窗口外观
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -158,13 +159,31 @@ public class ChatFrame {
                 File chooseFile;
                 if (resultVal == fileChooser.APPROVE_OPTION) { // 判断是否确定选择文件
                     chooseFile = fileChooser.getSelectedFile(); // 返回所选择的的文件
-                    System.out.println("导入文件:" + chooseFile.getPath());
+                    if(null !=chooseFile){
+                        String fileName = chooseFile.getName();
+                        DataUtils.client.send("@file^A^A^A"+fileName);
+                    }
                 } else {
                     System.out.println("没有导入");
                 }
             }
         });
+
         frame.add(fileLabel);
+
+        //添加文件列表的图标
+        JLabel flistLabel = new JLabel(new ImageIcon("img/surface/flist.png"));
+        flistLabel.setBounds((int) ((0.16 * 0.7 * height)), (int) (0.585 * 0.7 * height), 40, (int) (0.045 * 0.7 * height));
+        flistLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (null == tuFrame || null == tuFrame.getFrame()) {
+                    Point p = MouseInfo.getPointerInfo().getLocation();
+                    flistFrame = new FlistFrame((int) p.getX(), (int) p.getY() - 315);
+                }
+            }
+        });
+        frame.add(flistLabel);
 
         /**
          * 广告位
@@ -217,6 +236,10 @@ public class ChatFrame {
         scrollPanel3.setBounds(20, 1, (int) (0.2285 * 0.6 * width) - 20, (int) (0.32 * 0.7 * height));
         scrollPanel3.setBorder(null); // 去除边框
         panel4.add(scrollPanel3);
+    }
+
+    public static void main(String[] args){
+        new ChatFrame(null, null, null, null);
     }
 
 }
@@ -278,6 +301,48 @@ class TuFrame {
             });
             panel.add(tuArr[i]);
         }
+        frame.setVisible(true);
+    }
+}
+
+class FlistFrame{
+    private JFrame frame;
+
+    public JFrame getFrame() {
+        return frame;
+    }
+
+    public FlistFrame(int x, int y) {
+        frame = new JFrame();
+        frame.setUndecorated(true);        //窗口去边框
+        frame.setAlwaysOnTop(true);        //设置窗口总在最前
+        frame.setBackground(new Color(0, 0, 0, 0));        //设置窗口背景为透明色
+        frame.setBounds(x, y, 200, 300);
+
+        JLabel[] bts = new JLabel[10];
+        JLabel[] jls = new JLabel[10];
+        JPanel panel = new JPanel();
+        panel.setPreferredSize(new Dimension(190, 30*jls.length));
+        panel.setLayout(null);
+        panel.setBackground(Color.white);
+
+        for (int i = 0; i < jls.length; i++) {
+            jls[i] = new JLabel(i + "xxxxxxxxxxxxxxxxxxxxxx");
+            jls[i].setBounds(0, i * 30, 140, 30);
+            bts[i] = new JLabel("下载");
+            bts[i].setBounds(140, i * 30, 45, 30);
+            bts[i].setForeground(Color.BLUE);
+            panel.add(jls[i]);
+            panel.add(bts[i]);
+
+        }
+
+        JScrollPane scrollPane = new JScrollPane(panel);
+        //滚动条
+        scrollPane.setBounds(0, 0, 190, 290);
+        //设置横向滚动条不可见
+        scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        frame.add(scrollPane);
 
         frame.setVisible(true);
     }
