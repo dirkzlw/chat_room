@@ -90,6 +90,21 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
             return false;
         }
     }
+    /**
+     * 更新头像
+     */
+    @Override
+    public boolean updateHeadURL(User user) {
+        HibernateTemplate template = this.getHibernateTemplate();
+        try {
+            User user1 = template.get(User.class, user.getUserId());
+            user1.setHeadUrl(user.getHeadUrl());
+            template.update(user1);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
     /**
      * 根据用户名和密码查找用户

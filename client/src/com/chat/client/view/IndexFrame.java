@@ -16,9 +16,7 @@ import javax.swing.text.PlainDocument;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 
 /**
@@ -72,9 +70,11 @@ public class IndexFrame extends PlainDocument {
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // 关闭窗口程序结束
         frame.setLayout(null); // 布局设置为空
 
+
         //添加头像--先从本地读取，未读到根据url下载到本地
         String suf = FtpUtils.readHeadImg(user);
-        ImageIcon headIcon = new ImageIcon("img/head/" + user.getUsername() + "." + suf);
+        String sf = FtpUtils.readHeadImg(user);
+        ImageIcon headIcon = new ImageIcon("img/head/" + sf);
 
         JLabel sculLabel = new JLabel();
         sculLabel.setBounds(50, 50, (int) (0.045 * width), (int) (0.078 * height));
@@ -84,24 +84,100 @@ public class IndexFrame extends PlainDocument {
         sculLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
+
                 JFileChooser fileChooser = new JFileChooser("./"); // 文件选择器+默认路径
                 fileChooser.setFileFilter(new FileNameExtensionFilter("图片", "png","jpg","bmp","jepg")); // 选择类型
                 int resultVal = fileChooser.showOpenDialog(null); // 显示选择器
-                File chooseFile;
+                File chooseFile = null;
                 if (resultVal == fileChooser.APPROVE_OPTION) { // 判断是否确定选择文件
                     chooseFile = fileChooser.getSelectedFile(); // 返回所选择的的文件
-                    System.out.println("导入文件:" + chooseFile.getPath());
+                    if(null!=chooseFile){
+                        String[] split = chooseFile.getName().split("\\.");
+                        String suf = split[1];
+                        //进入该页面的时候新建文件：文件名：用户名+时间戳+后缀名
+                        String filename = user.getUsername()+"@"+System.currentTimeMillis()+"."+suf;//这个后缀名？
+                        /**
+                         * 1、将此文件上传到服务器中
+                         * 2、放到本地
+                         * 3、设置头像
+                         */
+                        InputStream input = null;
+                        try {
+                            input = new FileInputStream(chooseFile);
+                        } catch (FileNotFoundException e1) {
+                            e1.printStackTrace();
+                        }
+                        boolean flag = FtpUtils.uploadFile("39.107.249.220",
+                                21,
+                                "html_fs",
+                                "html_fs_pwd",
+                                "/home/html_fs",
+                                "/img",
+                                filename,
+                                input);
+
+                        if(flag){
+                            File file = new File("img/head/" + filename);
+                            if(!file.exists()){
+                                InputStream is=null;
+                                OutputStream out = null;
+                                try {
+                                    file.createNewFile();
+                                    is = new FileInputStream(chooseFile);
+                                    out = new FileOutputStream(file);
+                                    //写出文件
+                                    byte[] bs = new byte[1024];
+                                    int len ;
+                                    while ((len=is.read(bs))!=-1){
+                                        out.write(bs,0,len);
+                                    }
+                                } catch (IOException e1) {
+                                    e1.printStackTrace();
+                                } finally {
+                                    if(out!=null){
+                                        try {
+                                            out.close();
+                                        } catch (IOException e1) {
+                                            e1.printStackTrace();
+                                        }
+                                    }
+                                    if(input!=null){
+                                        try {
+                                            input.close();
+                                        } catch (IOException e1) {
+                                            e1.printStackTrace();
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+
+
+                        // url : 39.107.249.220:888/img/logo.png
+                        user.setHeadUrl("39.107.249.220:888/img/" + filename);
+                        //在后台更新user
+                        userService.updateHeanURL(user);
+                        //修改头像
+                        ImageIcon imageIcon = new ImageIcon("img/head/" + filename);
+                        imageIcon.setImage(imageIcon.getImage().getScaledInstance((int) (0.045 * width),
+                                (int) (0.078 * height), Image.SCALE_DEFAULT));
+                        sculLabel.setIcon(imageIcon);
+                    }
+
                 } else {
                     System.out.println("没有导入");
                 }
             }
         });
+
+
         frame.add(sculLabel);
 
         //添加昵称
         JLabel nameLabel = new JLabel(user.getUsername());
         nameLabel.setFont(new Font("System", Font.PLAIN, 26));
-        nameLabel.setBounds(70 + (int) (0.045 * width), 50, (int) (0.045 * width), 30);
+        nameLabel.setBounds(70 + (int) (0.045 * width), 50, (int) (0.13 * width), 30);
         frame.add(nameLabel);
 
         //添加签名
@@ -160,7 +236,7 @@ public class IndexFrame extends PlainDocument {
         ImageIcon[] headImg = new ImageIcon[userList.size()];
         for (int i = 0; i < userList.size(); i++) {
             suf = FtpUtils.readHeadImg(userList.get(i));
-            headImg[i] = new ImageIcon("img/head/" + userList.get(i).getUsername()+"." + suf);
+            headImg[i] = new ImageIcon("img/head/" +suf);
         }
         JLabel[] headList = new JLabel[userList.size()];
         //好友列表
@@ -184,6 +260,7 @@ public class IndexFrame extends PlainDocument {
         //滚动条
         JScrollPane scrollPane = new JScrollPane(panel1_0);
         scrollPane.setBounds(0, 0, (int) (0.21 * width), (int) (0.55 * height));
+        //设置横向滚动条不可见
         panel1.add(scrollPane);
 
         //添加群聊
@@ -226,6 +303,7 @@ public class IndexFrame extends PlainDocument {
         });
         JScrollPane scrollPane2 = new JScrollPane(panel2_0);
         scrollPane2.setBounds(0, 0, (int) (0.21 * width), (int) (0.55 * height));
+        //设置横向滚动条不可见
         panel2.add(scrollPane2);
 
         frame.setVisible(true);

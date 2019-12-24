@@ -17,5 +17,7 @@ public interface UserService {
 
     void updateSign(User user);
 
+    void updateHeanURL(User user);
+
     List<User> findAllUser();
 }

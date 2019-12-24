@@ -19,5 +19,7 @@ public interface UserDao {
 
     boolean updateSign(User user);
 
+    boolean updateHeadURL(User user);
+
     User findUser(String username, String password);
 }

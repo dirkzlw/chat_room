@@ -48,6 +48,11 @@ public class UserServiceImpl implements UserService {
         userDao.updateSign(user);
     }
 
+    @Override
+    public void updateHeanURL(User user) {
+        userDao.updateHeadURL(user);
+    }
+
     /**
      * 获取所有用户
      * @return

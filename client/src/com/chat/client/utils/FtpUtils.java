@@ -21,8 +21,7 @@ public class FtpUtils {
 
     public static String readHeadImg(User user){
         String[] split = user.getHeadUrl().split("/");
-        String suf = split[split.length-1].split("\\.")[1];
-        File f = new File("img/head/" + user.getUsername() + "." + suf);
+        File f = new File("img/head/" + split[split.length-1]);
         if (!f.exists()) {
             boolean b = FtpUtils.downFile("39.107.249.220",
                     21,
@@ -31,12 +30,12 @@ public class FtpUtils {
                     "img",
                     split[split.length - 1],
                     "img/head",
-                    user.getUsername() + "." + suf);
+                    split[split.length-1] );
             if(!b){
                 System.out.println("下载头像失败！");
             }
         }
-        return suf;
+        return split[split.length-1];
     }
 
     /**
