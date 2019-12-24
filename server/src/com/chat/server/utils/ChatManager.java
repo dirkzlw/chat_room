@@ -65,7 +65,6 @@ public class ChatManager {
             }
             nameList += clientName + ",";
         }
-        System.out.println("nameList = " + nameList);
         //去掉最后一个,
         String sub = nameList.substring(0, nameList.length() - 1);
         //将消息发送给在线用户

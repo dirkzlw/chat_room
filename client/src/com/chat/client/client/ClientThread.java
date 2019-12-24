@@ -1,8 +1,12 @@
 package com.chat.client.client;
 
 import com.chat.client.po.User;
+import com.chat.client.utils.DataUtils;
+import com.chat.client.utils.WindowXY;
 
 import javax.swing.*;
+import javax.swing.text.Document;
+import java.awt.*;
 import java.io.DataInputStream;
 import java.net.Socket;
 import java.util.List;
@@ -14,14 +18,14 @@ import java.util.List;
 public class ClientThread extends Thread {
 
     private Socket server;
-    private JTextArea textShow;
+    private JTextPane textPane;
     private JLabel jlist;
     private JTextArea memberList;
     private List<User> userList;
 
-    public ClientThread(Socket socket, JTextArea textArea, JLabel jlist, JTextArea memberList, List<User> userList) {
+    public ClientThread(Socket socket, JTextPane textPane, JLabel jlist, JTextArea memberList, List<User> userList) {
         this.server = socket;
-        this.textShow = textArea;
+        this.textPane = textPane;
         this.jlist = jlist;
         this.memberList = memberList;
         this.userList = userList;
@@ -34,9 +38,26 @@ public class ClientThread extends Thread {
             while (true) {
                 DataInputStream dis = new DataInputStream(server.getInputStream());
                 line = dis.readUTF();
-                System.out.println("dis = " + line);
+                System.out.println(line);
                 String[] split = line.split("@list\\^A\\^A\\^A");
-                textShow.append(split[0] + "\n");
+                //发送的是图片
+                if (split[0].contains("@img^A^A^A")) {
+                    String[] split2 = split[0].split("@img\\^A\\^A\\^A");
+                    //先展示文本
+                    Document doc = textPane.getDocument();
+                    doc.insertString(doc.getLength(), split2[0], null);
+                    //展示图片
+                    String img = split2[1];
+                    ImageIcon imageIcon = new ImageIcon("img/head/" + img);
+                    int w = imageIcon.getIconWidth();
+                    int h = imageIcon.getIconHeight();
+                    imageIcon.setImage(imageIcon.getImage().getScaledInstance(100, 100 * h / w, Image.SCALE_DEFAULT));
+                    textPane.insertIcon(imageIcon);
+                    doc.insertString(doc.getLength(), "\n", null);
+                } else {
+                    Document doc = textPane.getDocument();
+                    doc.insertString(doc.getLength(), split[0] + "\n", null);
+                }
                 //展示在线群成员列表
                 String[] split1 = split[1].split("\\,");
                 int count = 1;

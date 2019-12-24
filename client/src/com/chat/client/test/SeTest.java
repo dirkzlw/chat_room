@@ -1,15 +1,46 @@
 package com.chat.client.test;
 
-/**
- * @author Ranger
- * @create 2019-12-23 20:34
- */
-public class SeTest {
-    public static void main(String[] args){
-        String s = ",11,22,33,4,,";
-        String[] split = s.split(",");
-        for (String s1 : split) {
-            System.out.println("s1 = " + s1);
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
+
+class SeTest extends JPanel {
+
+    public static Image bj;
+
+    static {
+        try {
+            bj = ImageIO.read(new File("img/code/63NL.jpg"));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
+
+    public static void main(String[] args)  {
+        JFrame frame = new JFrame();
+        JPanel panel = new JPanel();
+        panel.setSize(200, 300);
+        frame.setSize(200, 300);
+        JTextArea textArea = new JTextArea();
+        textArea.setSize(200, 300);
+        panel.add(textArea);
+
+        frame.add(panel);
+
+        frame.setVisible(true);
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        g.drawImage(bj, 0, 0, null);                             //通过画笔，画出图片。
+    }
+
 }

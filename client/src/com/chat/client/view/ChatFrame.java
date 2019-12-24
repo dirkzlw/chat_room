@@ -2,12 +2,15 @@ package com.chat.client.view;
 
 import com.chat.client.client.Client;
 import com.chat.client.po.User;
+import com.chat.client.utils.DataUtils;
 import com.chat.client.utils.WindowXY;
 import lombok.Getter;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.DefaultCaret;
+import javax.swing.text.Document;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -30,7 +33,7 @@ public class ChatFrame {
     private JFrame frame;
     private TuFrame tuFrame;
     private Timer timer;
-    private JTextArea textShow = new JTextArea();
+    private JTextPane textPane = new JTextPane();
     @Getter
     private boolean isClose = false;
     private JLabel jlist = new JLabel("群成员", JLabel.CENTER);
@@ -40,8 +43,7 @@ public class ChatFrame {
     }
 
     public ChatFrame(String title, User user, List<User> userList, ChatFrame chatFrame) {
-
-        Client client = new Client(user.getUsername(), textShow, jlist, memberList, userList);
+        DataUtils.client = new Client(user.getUsername(), textPane, jlist, memberList, userList);
         // 设置窗口外观
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -71,7 +73,7 @@ public class ChatFrame {
                 //窗口关闭，停止定时器
                 timer.cancel();
                 //停止client
-                client.send("@exit^A^A^A");
+                DataUtils.client.send("@exit^A^A^A");
                 // 将当前对象置空
                 isClose = true;
             }
@@ -86,11 +88,15 @@ public class ChatFrame {
         panel1.setBounds(1, 1, (int) (0.78 * 0.6 * width), (int) (0.585 * 0.7 * height));
         panel1.setBorder(BorderFactory.createEtchedBorder());
         // 添加文本框
-        textShow.setFont(font);
-        textShow.setLineWrap(true); // 自动换行
-        textShow.setEditable(false);
+        textPane.setFont(font);
+//        textPane.setLineWrap(true); // 自动换行
+        textPane.setEditable(false);
+        // 以下3行 实现滚动条保持在最下部
+        DefaultCaret caret = (DefaultCaret)textPane.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+        textPane.setSelectionStart(textPane.getText().length());
         // 添加滚动条
-        JScrollPane scrollPanel1 = new JScrollPane(textShow);
+        JScrollPane scrollPanel1 = new JScrollPane(textPane);
         scrollPanel1.setBounds(10, 2, (int) (0.78 * 0.6 * width) - 10, (int) (0.585 * 0.7 * height) - 5);
         scrollPanel1.setBorder(null); // 去除边框
         panel1.add(scrollPanel1);
@@ -120,7 +126,7 @@ public class ChatFrame {
         sendBtn.setBounds((int) (0.78 * 0.6 * width) - 113, (int) (0.324 * 0.7 * height) - 52, 100, 40);
         sendBtn.addActionListener(e -> {
             String inLine = textIn.getText();
-            client.send(inLine);
+            DataUtils.client.send(inLine);
             textIn.setText("");
         });
         panel2.add(sendBtn);
@@ -259,6 +265,17 @@ class TuFrame {
             imgs[i].setImage(imgs[i].getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
             tuArr[i] = new JLabel(imgs[i]);
             tuArr[i].setBounds(i % 5 * 50, (i / 5) * 50 + 15, 50, 50);
+            // 监听点击事件，发送表情包
+            int finalI = i;
+            tuArr[i].addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    String inLine = "@img^A^A^Ah"+ finalI+".jpg";
+                    DataUtils.client.send(inLine);
+                    frame.dispose();
+                    frame=null;
+                }
+            });
             panel.add(tuArr[i]);
         }
 
