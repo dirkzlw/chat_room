@@ -54,6 +54,13 @@ public class ClientThread extends Thread {
                     imageIcon.setImage(imageIcon.getImage().getScaledInstance(100, 100 * h / w, Image.SCALE_DEFAULT));
                     textPane.insertIcon(imageIcon);
                     doc.insertString(doc.getLength(), "\n", null);
+                } else if (split[0].contains("@file^A^A^A")) {
+                    //发送的是文件
+                    String[] split2 = split[0].split("@file\\^A\\^A\\^A");
+                    //先展示文本
+                    Document doc = textPane.getDocument();
+                    doc.insertString(doc.getLength(), split2[0] + "[文件] "+split2[1] + "\n", null);
+                    //展示图片
                 } else {
                     Document doc = textPane.getDocument();
                     doc.insertString(doc.getLength(), split[0] + "\n", null);

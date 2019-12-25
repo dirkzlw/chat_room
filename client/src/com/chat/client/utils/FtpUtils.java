@@ -12,6 +12,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Ranger
@@ -19,6 +21,45 @@ import java.io.OutputStream;
  */
 public class FtpUtils {
 
+    public static List<String> getDirFiles(String host,
+                                           int port,
+                                           String username,
+                                           String password,
+                                           String basePath,
+                                           String filePath){
+        List<String> fileList = new ArrayList<>();
+        FTPClient ftp = new FTPClient();
+        try {
+            ftp.connect(host, port);
+            ftp.login(username, password);
+            if (!FTPReply.isPositiveCompletion(ftp.getReplyCode())) {
+                ftp.disconnect();
+            }
+            //切换到上传目录
+            if (ftp.changeWorkingDirectory(basePath + filePath)) {
+                FTPFile[] ftpFiles = ftp.listFiles();
+                for (FTPFile ftpFile : ftpFiles) {
+                    fileList.add(new String(ftpFile.getName().getBytes("ISO-8859-1"),"UTF-8"));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (ftp.isConnected()) {
+                try {
+                    ftp.disconnect();
+                } catch (IOException ioe) {
+                }
+            }
+        }
+        return fileList;
+    }
+    /**
+     * 读取指定用户头像
+     * 如不存在则根据指定url下载
+     * @param user
+     * @return
+     */
     public static String readHeadImg(User user){
         String[] split = user.getHeadUrl().split("/");
         File f = new File("img/head/" + split[split.length-1]);
@@ -75,7 +116,7 @@ public class FtpUtils {
             ftp.changeWorkingDirectory(remotePath);//转移到FTP服务器目录
             FTPFile[] fs = ftp.listFiles();
             for (FTPFile ff : fs) {
-                if (ff.getName().equals(srcFileName)) {
+                if (new String(ff.getName().getBytes("ISO-8859-1"),"UTF-8").equals(srcFileName)) {
                     File localFile = new File(localPath + "/" + toFileName);
                     OutputStream is = new FileOutputStream(localFile);
                     ftp.retrieveFile(ff.getName(), is);
@@ -156,7 +197,7 @@ public class FtpUtils {
             //设置上传文件的类型为二进制类型
             ftp.setFileType(FTP.BINARY_FILE_TYPE);
             //上传文件
-            if (!ftp.storeFile(filename, in)) {
+            if (!ftp.storeFile(new String(filename.getBytes("UTF-8"), "iso-8859-1"), in)) {
                 return result;
             }
             in.close();

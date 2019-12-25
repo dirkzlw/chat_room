@@ -45,6 +45,15 @@ public class ServerThread extends Thread {
                             }
                             continue;
                         } else if (line.contains("@img^A^A^A")) {
+                            //处理的表情包
+                            synchronized (DataUtils.online) {
+                                String msg = clientName + "  " + DateUtils.getDate() + "\n    · "
+                                        + line;
+                                ChatManager.sendToClients(msg);
+                            }
+                            continue;
+                        }else if(line.contains("@file^A^A^A")){
+                            //处理文件
                             synchronized (DataUtils.online) {
                                 String msg = clientName + "  " + DateUtils.getDate() + "\n    · "
                                         + line;

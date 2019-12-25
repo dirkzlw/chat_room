@@ -3,6 +3,7 @@ package com.chat.client.view;
 import com.chat.client.client.Client;
 import com.chat.client.po.User;
 import com.chat.client.utils.DataUtils;
+import com.chat.client.utils.FtpUtils;
 import com.chat.client.utils.WindowXY;
 import lombok.Getter;
 
@@ -18,7 +19,11 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -44,7 +49,7 @@ public class ChatFrame {
     }
 
     public ChatFrame(String title, User user, List<User> userList, ChatFrame chatFrame) {
-//        DataUtils.client = new Client(user.getUsername(), textPane, jlist, memberList, userList);
+        DataUtils.client = new Client(user.getUsername(), textPane, jlist, memberList, userList);
         // 设置窗口外观
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -90,10 +95,9 @@ public class ChatFrame {
         panel1.setBorder(BorderFactory.createEtchedBorder());
         // 添加文本框
         textPane.setFont(font);
-//        textPane.setLineWrap(true); // 自动换行
         textPane.setEditable(false);
         // 以下3行 实现滚动条保持在最下部
-        DefaultCaret caret = (DefaultCaret)textPane.getCaret();
+        DefaultCaret caret = (DefaultCaret) textPane.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         textPane.setSelectionStart(textPane.getText().length());
         // 添加滚动条
@@ -110,7 +114,6 @@ public class ChatFrame {
         panel2.setLayout(null);
         panel2.setBackground(Color.white);
         panel2.setBounds(1, (int) (0.63 * 0.7 * height), (int) (0.78 * 0.6 * width), (int) (0.324 * 0.7 * height));
-//        panel2.setBorder(BorderFactory.createEtchedBorder());
         // 添加文本框
         JTextArea textIn = new JTextArea();
         textIn.setFont(font);
@@ -159,12 +162,29 @@ public class ChatFrame {
                 File chooseFile;
                 if (resultVal == fileChooser.APPROVE_OPTION) { // 判断是否确定选择文件
                     chooseFile = fileChooser.getSelectedFile(); // 返回所选择的的文件
-                    if(null !=chooseFile){
+                    if (null != chooseFile) {
+                        InputStream is = null;
+                        boolean b = false;
                         String fileName = chooseFile.getName();
-                        DataUtils.client.send("@file^A^A^A"+fileName);
+                        try {
+                            is = new FileInputStream(chooseFile);
+                            b = FtpUtils.uploadFile("39.107.249.220",
+                                    21,
+                                    "html_fs",
+                                    "html_fs_pwd",
+                                    "/home/html_fs",
+                                    "/file",
+                                    fileName,
+                                    is);
+                        } catch (FileNotFoundException e1) {
+                            e1.printStackTrace();
+                        }
+                        if(b){
+                            DataUtils.client.send("@file^A^A^A" + fileName);
+                        }else {
+                            JOptionPane.showMessageDialog(null, "标题【错误】", "上传失败，请检查网络！", JOptionPane.ERROR_MESSAGE);
+                        }
                     }
-                } else {
-                    System.out.println("没有导入");
                 }
             }
         });
@@ -177,7 +197,7 @@ public class ChatFrame {
         flistLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (null == tuFrame || null == tuFrame.getFrame()) {
+                if (null == flistFrame || null == flistFrame.getFrame()) {
                     Point p = MouseInfo.getPointerInfo().getLocation();
                     flistFrame = new FlistFrame((int) p.getX(), (int) p.getY() - 315);
                 }
@@ -238,7 +258,7 @@ public class ChatFrame {
         panel4.add(scrollPanel3);
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         new ChatFrame(null, null, null, null);
     }
 
@@ -293,10 +313,10 @@ class TuFrame {
             tuArr[i].addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    String inLine = "@img^A^A^Ah"+ finalI+".jpg";
+                    String inLine = "@img^A^A^Ah" + finalI + ".jpg";
                     DataUtils.client.send(inLine);
                     frame.dispose();
-                    frame=null;
+                    frame = null;
                 }
             });
             panel.add(tuArr[i]);
@@ -305,7 +325,7 @@ class TuFrame {
     }
 }
 
-class FlistFrame{
+class FlistFrame {
     private JFrame frame;
 
     public JFrame getFrame() {
@@ -319,27 +339,105 @@ class FlistFrame{
         frame.setBackground(new Color(0, 0, 0, 0));        //设置窗口背景为透明色
         frame.setBounds(x, y, 200, 300);
 
-        JLabel[] bts = new JLabel[10];
-        JLabel[] jls = new JLabel[10];
+        List<String> fileNameList = FtpUtils.getDirFiles(("39.107.249.220"),
+                21,
+                "html_fs",
+                "html_fs_pwd",
+                "/home/html_fs",
+                "/file");
+
+        JLabel[] bts = new JLabel[fileNameList.size()];
+        JLabel[] jls = new JLabel[fileNameList.size()];
         JPanel panel = new JPanel();
-        panel.setPreferredSize(new Dimension(190, 30*jls.length));
+        panel.setPreferredSize(new Dimension(190, 30 * (jls.length+1)));
         panel.setLayout(null);
         panel.setBackground(Color.white);
 
+        //添加关闭按钮
+        ImageIcon closeIcon = new ImageIcon("img/surface/close.png");
+        closeIcon.setImage(closeIcon.getImage().getScaledInstance(15, 15, Image.SCALE_DEFAULT));
+        JLabel closeBtn = new JLabel(closeIcon);
+        closeBtn.setBounds(150, 10, 15, 15);
+        closeBtn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                frame.dispose();
+                frame = null;
+            }
+        });
+        panel.add(closeBtn);
+
         for (int i = 0; i < jls.length; i++) {
-            jls[i] = new JLabel(i + "xxxxxxxxxxxxxxxxxxxxxx");
-            jls[i].setBounds(0, i * 30, 140, 30);
+            jls[i] = new JLabel(fileNameList.get(i));
+            jls[i].setBounds(0, 30 + i * 30, 135, 30);
             bts[i] = new JLabel("下载");
-            bts[i].setBounds(140, i * 30, 45, 30);
+            bts[i].setBounds(135, 30 + i * 30, 45, 30);
             bts[i].setForeground(Color.BLUE);
+            int finalI = i;
+            bts[i].addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    String filename = fileNameList.get(finalI);
+                    JFileChooser fileChooser = new JFileChooser("./"); // 文件选择器+默认路径
+                    fileChooser.setFileFilter(new FileNameExtensionFilter("文本文件(*.txt)", "txt")); // 选择类型
+                    int resultVal = fileChooser.showSaveDialog(null); // 显示选择器
+                    if (resultVal == fileChooser.APPROVE_OPTION) { // 判断是否确定选择文件
+                        File file = fileChooser.getSelectedFile();
+                        if(null!=file){
+                            if(!file.exists()){
+                                try {
+                                    file.createNewFile();
+                                } catch (IOException e1) {
+                                    e1.printStackTrace();
+                                }
+                                boolean b = FtpUtils.downFile("39.107.249.220",
+                                        21,
+                                        "html_fs",
+                                        "html_fs_pwd",
+                                        "file",
+                                        filename,
+                                        file.getParent(),
+                                        file.getName());
+                                if(b){
+                                    frame.dispose();
+                                    frame = null;
+                                    JOptionPane.showMessageDialog(null, "文件下载成功！","【成功】",JOptionPane.INFORMATION_MESSAGE);
+                                }else {
+                                    JOptionPane.showMessageDialog(null, "下载失败，请检查网络！", "【错误】", JOptionPane.ERROR_MESSAGE);
+                                }
+                            }else {
+                                int response = JOptionPane.showConfirmDialog(null, "确认替换文件？", "确认", JOptionPane.YES_NO_OPTION);
+                                if(response==0){
+                                    boolean b = FtpUtils.downFile("39.107.249.220",
+                                            21,
+                                            "html_fs",
+                                            "html_fs_pwd",
+                                            "file",
+                                            filename,
+                                            file.getParent(),
+                                            file.getName());
+                                    if(b){
+                                        frame.dispose();
+                                        frame = null;
+                                        JOptionPane.showMessageDialog(null, "文件下载成功！","【成功】",JOptionPane.INFORMATION_MESSAGE);
+                                    }else {
+                                        JOptionPane.showMessageDialog(null, "下载失败，请检查网络！", "【错误】", JOptionPane.ERROR_MESSAGE);
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        System.out.println("没有保存");
+                    }
+                }
+            });
             panel.add(jls[i]);
             panel.add(bts[i]);
-
         }
 
         JScrollPane scrollPane = new JScrollPane(panel);
         //滚动条
-        scrollPane.setBounds(0, 0, 190, 290);
+        scrollPane.setBounds(0, 0, 200, 285);
         //设置横向滚动条不可见
         scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         frame.add(scrollPane);
