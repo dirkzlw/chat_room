@@ -1,5 +1,6 @@
 package com.chat.client.view;
 
+import com.chat.client.dao.UserDao;
 import com.chat.client.po.User;
 import com.chat.client.service.UserService;
 import com.chat.client.utils.DataUtils;
@@ -16,7 +17,6 @@ import javax.swing.text.PlainDocument;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.io.*;
 import java.util.List;
 
@@ -57,6 +57,12 @@ public class IndexFrame extends PlainDocument {
         }
         double width = WindowXY.getWidth();
         double height = WindowXY.getHeight();
+
+        ImageIcon imageIcon = new ImageIcon("img/surface/backgroud1.png");
+        imageIcon.setImage(imageIcon.getImage().getScaledInstance((int) (0.232 * width),(int) (0.78 * height),Image.SCALE_DEFAULT));
+        JLabel backgroud = new JLabel(imageIcon);
+        backgroud.setOpaque(false);
+        backgroud.setBounds(0, 0, (int) (0.232 * width), (int) (0.78 * height));
         frame = new JFrame();
         //设置窗口相关参数
         // 位置及大小
@@ -71,7 +77,6 @@ public class IndexFrame extends PlainDocument {
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // 关闭窗口程序结束
         frame.setLayout(null); // 布局设置为空
 
-
         //添加头像--先从本地读取，未读到根据url下载到本地
         String suf = FtpUtils.readHeadImg(user);
         String sf = FtpUtils.readHeadImg(user);
@@ -85,7 +90,6 @@ public class IndexFrame extends PlainDocument {
         sculLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-
                 JFileChooser fileChooser = new JFileChooser("./"); // 文件选择器+默认路径
                 fileChooser.setFileFilter(new FileNameExtensionFilter("图片", "png","jpg","bmp","jepg")); // 选择类型
                 int resultVal = fileChooser.showOpenDialog(null); // 显示选择器
@@ -171,8 +175,6 @@ public class IndexFrame extends PlainDocument {
                 }
             }
         });
-
-
         frame.add(sculLabel);
 
         //添加昵称
@@ -332,6 +334,7 @@ public class IndexFrame extends PlainDocument {
         //设置横向滚动条不可见
         panel2.add(scrollPane2);
 
+        frame.add(backgroud);
         frame.setVisible(true);
     }
 }
