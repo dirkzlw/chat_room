@@ -1,8 +1,10 @@
 package com.chat.client.view;
 
+import com.chat.client.client.Client;
 import com.chat.client.po.User;
 import com.chat.client.service.UserService;
 import com.chat.client.utils.CodeUtil;
+import com.chat.client.utils.DataUtils;
 import com.chat.client.utils.GlobalCodeMgr;
 import com.chat.client.utils.WindowXY;
 import org.springframework.context.ApplicationContext;
@@ -76,13 +78,12 @@ public class LoginFrame {
             if(user!=null){
                 //登录成功
                 System.out.println("登录成功！");
-                frame.setVisible(false);
+                DataUtils.client = new Client();
                 new IndexFrame(user);
                 frame.dispose();
             }else{
                 JOptionPane.showMessageDialog(null,"用户名或密码错误！","登录失败",JOptionPane.PLAIN_MESSAGE);
             }
-
         });
 
         //注册
@@ -222,22 +223,6 @@ public class LoginFrame {
             String code = JT_checkcode.getText().trim();
             System.out.println("用户名："+username);
 
-//                /**
-//                 * 用户名：4到16位（字母，数字，下划线，减号）
-//                 * 密码：长度为4-20的所有字符）
-//                 */
-//                String reg_username = "^[a-zA-Z0-9_-]{4,16}$";
-//                String reg_password = "^.{4,20}$";
-//
-//                if(!username.matches(reg_username)){
-//                    JOptionPane.showMessageDialog(null,"用户名格式不对！","提醒",JOptionPane.PLAIN_MESSAGE);
-//                    return;
-//                }
-//                if(!password.matches(reg_password)){
-//                    JOptionPane.showMessageDialog(null,"密码长度至少4位！","提醒",JOptionPane.PLAIN_MESSAGE);
-//                    return;
-//
-//                }
             if(!password.equals(verPsw)){
                 System.out.println("两次密码输入不一致");
                 JOptionPane.showMessageDialog(null,"两次密码输入不一致！","提醒",JOptionPane.PLAIN_MESSAGE);
@@ -292,7 +277,6 @@ public class LoginFrame {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
 
         /**
          * 添加各组件

@@ -1,6 +1,7 @@
 package com.chat.client.view;
 
 import com.chat.client.client.Client;
+import com.chat.client.client.ClientThread;
 import com.chat.client.po.User;
 import com.chat.client.utils.DataUtils;
 import com.chat.client.utils.FtpUtils;
@@ -17,6 +18,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -24,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.Socket;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -41,15 +44,23 @@ public class ChatFrame {
     private Timer timer;
     private JTextPane textPane = new JTextPane();
     @Getter
-    private boolean isClose = false;
+    private boolean close = false;
     private JLabel jlist = new JLabel("群成员", JLabel.CENTER);
     private JTextArea memberList = new JTextArea();
 
     public ChatFrame() {
     }
 
-    public ChatFrame(String title, User user, List<User> userList, ChatFrame chatFrame) {
-        DataUtils.client = new Client(user.getUsername(), textPane, jlist, memberList, userList);
+    public ChatFrame(String title, User user, List<User> userList) {
+        if(!isClose()){
+            //初始化Client
+            DataUtils.client.setTextPane(textPane);
+            DataUtils.client.setJlist(jlist);
+            DataUtils.client.setMemberList(memberList);
+            DataUtils.client.setUserList(userList);
+            DataUtils.client.send(user.getUsername());
+            new ClientThread(DataUtils.client.getServer(), textPane, jlist, memberList, userList).start();
+        }
         // 设置窗口外观
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -81,7 +92,8 @@ public class ChatFrame {
                 //停止client
                 DataUtils.client.send("@exit^A^A^A");
                 // 将当前对象置空
-                isClose = true;
+                frame.setVisible(false);
+                close = true;
             }
         });
 
@@ -179,9 +191,9 @@ public class ChatFrame {
                         } catch (FileNotFoundException e1) {
                             e1.printStackTrace();
                         }
-                        if(b){
+                        if (b) {
                             DataUtils.client.send("@file^A^A^A" + fileName);
-                        }else {
+                        } else {
                             JOptionPane.showMessageDialog(null, "标题【错误】", "上传失败，请检查网络！", JOptionPane.ERROR_MESSAGE);
                         }
                     }
@@ -259,7 +271,7 @@ public class ChatFrame {
     }
 
     public static void main(String[] args) {
-        new ChatFrame(null, null, null, null);
+        new ChatFrame(null, null, null);
     }
 
 }
@@ -349,7 +361,7 @@ class FlistFrame {
         JLabel[] bts = new JLabel[fileNameList.size()];
         JLabel[] jls = new JLabel[fileNameList.size()];
         JPanel panel = new JPanel();
-        panel.setPreferredSize(new Dimension(190, 30 * (jls.length+1)));
+        panel.setPreferredSize(new Dimension(190, 30 * (jls.length + 1)));
         panel.setLayout(null);
         panel.setBackground(Color.white);
 
@@ -383,8 +395,8 @@ class FlistFrame {
                     int resultVal = fileChooser.showSaveDialog(null); // 显示选择器
                     if (resultVal == fileChooser.APPROVE_OPTION) { // 判断是否确定选择文件
                         File file = fileChooser.getSelectedFile();
-                        if(null!=file){
-                            if(!file.exists()){
+                        if (null != file) {
+                            if (!file.exists()) {
                                 try {
                                     file.createNewFile();
                                 } catch (IOException e1) {
@@ -398,16 +410,16 @@ class FlistFrame {
                                         filename,
                                         file.getParent(),
                                         file.getName());
-                                if(b){
+                                if (b) {
                                     frame.dispose();
                                     frame = null;
-                                    JOptionPane.showMessageDialog(null, "文件下载成功！","【成功】",JOptionPane.INFORMATION_MESSAGE);
-                                }else {
+                                    JOptionPane.showMessageDialog(null, "文件下载成功！", "【成功】", JOptionPane.INFORMATION_MESSAGE);
+                                } else {
                                     JOptionPane.showMessageDialog(null, "下载失败，请检查网络！", "【错误】", JOptionPane.ERROR_MESSAGE);
                                 }
-                            }else {
+                            } else {
                                 int response = JOptionPane.showConfirmDialog(null, "确认替换文件？", "确认", JOptionPane.YES_NO_OPTION);
-                                if(response==0){
+                                if (response == 0) {
                                     boolean b = FtpUtils.downFile("39.107.249.220",
                                             21,
                                             "html_fs",
@@ -416,11 +428,11 @@ class FlistFrame {
                                             filename,
                                             file.getParent(),
                                             file.getName());
-                                    if(b){
+                                    if (b) {
                                         frame.dispose();
                                         frame = null;
-                                        JOptionPane.showMessageDialog(null, "文件下载成功！","【成功】",JOptionPane.INFORMATION_MESSAGE);
-                                    }else {
+                                        JOptionPane.showMessageDialog(null, "文件下载成功！", "【成功】", JOptionPane.INFORMATION_MESSAGE);
+                                    } else {
                                         JOptionPane.showMessageDialog(null, "下载失败，请检查网络！", "【错误】", JOptionPane.ERROR_MESSAGE);
                                     }
                                 }

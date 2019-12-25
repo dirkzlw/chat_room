@@ -40,12 +40,18 @@ public class ServerThread extends Thread {
                             synchronized (DataUtils.online) {
                                 String msg = "系统提示  " + DateUtils.getDate() + "\n    · "
                                         + clientName + "已退出群聊..." + "当前人数：" + --DataUtils.online;
-                                client.close();
+                                ChatManager.sendToClients(msg);
+                            }
+                            continue;
+                        } else if(line.contains("@in^A^A^A")){
+                            synchronized (DataUtils.online) {
+                                String msg = "系统提示  " + DateUtils.getDate() + "\n    · "
+                                        + clientName + "进入群聊..." + "当前人数：" + ++DataUtils.online;
                                 ChatManager.sendToClients(msg);
                             }
                             continue;
                         } else if (line.contains("@img^A^A^A")) {
-                            //处理的表情包
+                            //处理表情包
                             synchronized (DataUtils.online) {
                                 String msg = clientName + "  " + DateUtils.getDate() + "\n    · "
                                         + line;

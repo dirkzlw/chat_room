@@ -1,6 +1,8 @@
 package com.chat.client.client;
 
 import com.chat.client.po.User;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.swing.*;
 import java.io.DataOutputStream;
@@ -14,19 +16,23 @@ import java.util.List;
  */
 public class Client {
     DataOutputStream dos;
-
+    @Setter
+    private JTextPane textPane;
+    @Setter
+    private JLabel jlist;
+    @Setter
+    private JTextArea memberList;
+    @Setter
+    private List<User> userList;
+    @Getter
+    private Socket server;
     //初始化连接
-    public Client(String username, JTextPane textPane, JLabel jlist, JTextArea memberList, List<User> userList) {
+    public Client() {
         try {
-            Socket server = new Socket("127.0.0.1", 8088);
-            new ClientThread(server,textPane,jlist,memberList,userList).start();
+            server = new Socket("127.0.0.1", 8088);
             dos = new DataOutputStream(server.getOutputStream());
-            //随机生成名字发送至server
-            dos.writeUTF(username);
-            dos.flush();
-
         } catch (IOException e) {
-            System.out.println("服务器已关闭...3秒后退出程序!");
+            JOptionPane.showMessageDialog(null, "服务器已关闭...3秒后退出程序!", "【错误】", JOptionPane.ERROR_MESSAGE);
             try {
                 Thread.sleep(3000);
             } catch (InterruptedException e1) {
@@ -41,8 +47,8 @@ public class Client {
         try {
             dos.writeUTF(inLine);
             dos.flush();
-        } catch (Exception e){
-            System.out.println("服务器已关闭...");
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "服务器已关闭...3秒后退出程序!", "【错误】", JOptionPane.ERROR_MESSAGE);
             System.exit(0);
         }
     }

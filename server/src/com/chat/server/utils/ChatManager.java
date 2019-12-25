@@ -37,7 +37,7 @@ public class ChatManager {
             }
             synchronized (DataUtils.online) {
                 String msg = "系统提示  " + DateUtils.getDate() + "\n    · "
-                        + clientName + "已连接..." + "当前人数：" + ++DataUtils.online;
+                        + clientName + "进入群聊..." + "当前人数：" + ++DataUtils.online;
                 ChatManager.sendToClients(msg);
             }
             //将client加入新线程

@@ -1,8 +1,8 @@
 package com.chat.client.view;
 
-import com.chat.client.dao.UserDao;
 import com.chat.client.po.User;
 import com.chat.client.service.UserService;
+import com.chat.client.utils.DataUtils;
 import com.chat.client.utils.FtpUtils;
 import com.chat.client.utils.WindowXY;
 import org.springframework.context.ApplicationContext;
@@ -316,13 +316,14 @@ public class IndexFrame extends PlainDocument {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if(null != chatFrame){
-                    if(chatFrame.isClose()){
-                        chatFrame = new ChatFrame("群聊", user, userList,chatFrame);
+                    if(!chatFrame.getFrame().isVisible()){
+                        chatFrame.getFrame().setVisible(true);
+                        DataUtils.client.send("@in^A^A^A"+user.getUsername());
                     }
                     chatFrame.getFrame().setAlwaysOnTop(true);
                     chatFrame.getFrame().setAlwaysOnTop(false);
                 }else {
-                    chatFrame = new ChatFrame("群聊", user, userList,chatFrame);
+                    chatFrame = new ChatFrame("群聊", user, userList);
                 }
             }
         });
@@ -332,14 +333,5 @@ public class IndexFrame extends PlainDocument {
         panel2.add(scrollPane2);
 
         frame.setVisible(true);
-    }
-
-    public static void main(String[] args) {
-        User user = new User("main", null,
-                "39.107.249.220:888/img/scul.png",
-                "留下您的个性签名！");
-        user.setUserId(1);
-
-        new IndexFrame(user);
     }
 }
