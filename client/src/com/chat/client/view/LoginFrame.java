@@ -40,7 +40,9 @@ public class LoginFrame {
      */
     public void initFrame(double para) {
 
-        JLabel backgroud = new JLabel(new ImageIcon("img/surface/backgroud.jpg"));
+        ImageIcon imageIcon = new ImageIcon("img/surface/backgroud.jpg");
+        imageIcon.setImage(imageIcon.getImage().getScaledInstance((int)( WindowXY.getWidth() * (0.262)),(int) (WindowXY.getHeight() * (0.6)),Image.SCALE_DEFAULT));
+        JLabel backgroud = new JLabel(imageIcon);
         backgroud.setBounds(0, 0, (int)( WindowXY.getWidth() * (0.262)),(int) (WindowXY.getHeight() * (0.6)));
 
         String codePathName = "img/code";
