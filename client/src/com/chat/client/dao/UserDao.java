@@ -22,4 +22,6 @@ public interface UserDao {
     boolean updateHeadURL(User user);
 
     User findUser(String username, String password);
+
+    boolean updateUsername(User user);
 }

@@ -19,5 +19,10 @@ public interface UserService {
 
     void updateHeanURL(User user);
 
+    void updateUsername(User user);
+
+    //判断用户名是否存在
+    boolean checkExist(String username);
+
     List<User> findAllUser();
 }

@@ -105,6 +105,21 @@ public class UserDaoImpl extends HibernateDaoSupport implements UserDao {
             return false;
         }
     }
+    /**
+     * 更新用户昵称
+     */
+    @Override
+    public boolean updateUsername(User user) {
+        HibernateTemplate template = this.getHibernateTemplate();
+        try {
+            User user1 = template.get(User.class, user.getUserId());
+            user1.setUsername(user.getUsername());
+            template.update(user1);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
     /**
      * 根据用户名和密码查找用户

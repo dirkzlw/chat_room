@@ -16,6 +16,7 @@ import javax.swing.text.PlainDocument;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.*;
 import java.util.List;
 
@@ -178,6 +179,30 @@ public class IndexFrame extends PlainDocument {
         JLabel nameLabel = new JLabel(user.getUsername());
         nameLabel.setFont(new Font("System", Font.PLAIN, 26));
         nameLabel.setBounds(70 + (int) (0.045 * width), 50, (int) (0.13 * width), 30);
+        /**
+         * 修改昵称
+         */
+        nameLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+//                super.mouseClicked(e);
+                String nickName = JOptionPane.showInputDialog("更改昵称");
+                if(nickName==null||"".equals(nickName)){
+                    System.out.println("取消更改。。");
+                    return;
+                }
+                //检查该用户名是否已经被注册
+                boolean flag = userService.checkExist(nickName);
+                if(flag){
+                    JOptionPane.showMessageDialog(null,"该名字已被注册，请换一个！","提醒",JOptionPane.PLAIN_MESSAGE);
+                    return;
+                }
+                //设置用户名
+                user.setUsername(nickName);
+                userService.updateUsername(user);
+                nameLabel.setText(nickName);
+            }
+        });
         frame.add(nameLabel);
 
         //添加签名

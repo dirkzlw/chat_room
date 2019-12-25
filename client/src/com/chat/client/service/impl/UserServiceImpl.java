@@ -53,6 +53,17 @@ public class UserServiceImpl implements UserService {
         userDao.updateHeadURL(user);
     }
 
+    @Override
+    public void updateUsername(User user) {
+        userDao.updateUsername(user);
+    }
+
+    @Override
+    public boolean checkExist(String username) {
+        return userDao.checkExist(username);
+    }
+
+
     /**
      * 获取所有用户
      * @return
