@@ -19,6 +19,8 @@ import java.applet.AudioClip;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -31,6 +33,15 @@ import java.util.Random;
  */
 public class IndexFrame extends PlainDocument {
     int  ordinalNum = 1;//序数，皮肤顺序更换
+    URL soundFile;
+    {
+        try {
+            soundFile = new URL("file:music/bgMusic.wav");
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+    }
+    AudioClip sound = Applet.newAudioClip(soundFile);
 
     ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
     private UserService userService = ctx.getBean(UserService.class);
@@ -253,8 +264,9 @@ public class IndexFrame extends PlainDocument {
         /**
          * 换肤
          */
-        JButton changeBg  = new JButton("换肤");
-        changeBg.setFont(new Font("System", Font.PLAIN, 19));
+        ImageIcon skin = new ImageIcon("img/surface/skin.png");
+        JLabel changeBg  = new JLabel(skin);
+        changeBg.setFont(new Font("System", Font.PLAIN, 20));
         changeBg.setBounds(230 + (int) (0.045 * width), 50, (int) (0.048 * width), 30);
         changeBg.setBackground(Color.WHITE);
         changeBg.addMouseListener(new MouseAdapter() {
@@ -278,25 +290,35 @@ public class IndexFrame extends PlainDocument {
         /**
          * 背景音乐
          */
-        JButton musicBg  = new JButton("音乐");
+        JLabel musicBg  = new JLabel(new ImageIcon("img/surface/music.png"));
         musicBg.setFont(new Font("System", Font.PLAIN, 19));
         musicBg.setBounds(230 + (int) (0.045 * width), (int)(frame.getY()*10.4), (int) (0.048 * width), 30);
-        musicBg.setBackground(Color.WHITE);
+        musicBg.setOpaque(false);
         musicBg.addMouseListener(new MouseAdapter() {
+            boolean flag = false;
             @Override
             public void mouseClicked(MouseEvent e) {
-                try {
-                    URL soundFile = new URL("file:music/bgMusic.wav");
-                    AudioClip sound = Applet.newAudioClip(soundFile);
-                    sound.loop();
-
-                } catch (MalformedURLException e1) {
-                    e1.printStackTrace();
+                flag = !flag;
+                System.out.println("标志位："+flag);
+                if(flag) {
+                    System.out.println("开始播放。。。");
+                    sound.play();
+                }else {
+                    System.out.println("停止播放。。");
+                    sound.stop();
                 }
             }
         });
         frame.add(musicBg);
-
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                //窗口关闭
+                if(null!=sound){
+                    sound.stop();
+                }
+            }
+        });
         /**
          * 好友列表
          */
