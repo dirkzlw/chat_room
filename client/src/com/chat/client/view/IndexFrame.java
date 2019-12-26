@@ -14,17 +14,23 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
+import java.applet.Applet;
+import java.applet.AudioClip;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
+import java.util.Random;
 
 /**
  * @author Ranger
  * @create 2019-12-18 21:55
  */
 public class IndexFrame extends PlainDocument {
+    int  ordinalNum = 1;//序数，皮肤顺序更换
 
     ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml");
     private UserService userService = ctx.getBean(UserService.class);
@@ -32,6 +38,7 @@ public class IndexFrame extends PlainDocument {
     private JFrame frame;
     private int limit;  //限制的长度
     private ChatFrame chatFrame;
+    private OneChatFrame oneChatFrame;
 
     public IndexFrame(){}
 
@@ -63,6 +70,9 @@ public class IndexFrame extends PlainDocument {
         JLabel backgroud = new JLabel(imageIcon);
         backgroud.setOpaque(false);
         backgroud.setBounds(0, 0, (int) (0.232 * width), (int) (0.78 * height));
+
+
+
         frame = new JFrame();
         //设置窗口相关参数
         // 位置及大小
@@ -180,7 +190,9 @@ public class IndexFrame extends PlainDocument {
         //添加昵称
         JLabel nameLabel = new JLabel(user.getUsername());
         nameLabel.setFont(new Font("System", Font.PLAIN, 26));
-        nameLabel.setBounds(70 + (int) (0.045 * width), 50, (int) (0.13 * width), 30);
+        nameLabel.setBounds(70 + (int) (0.045 * width), 50, (int) (0.08 * width), 30);
+
+
         /**
          * 修改昵称
          */
@@ -239,6 +251,53 @@ public class IndexFrame extends PlainDocument {
         frame.add(signField);
 
         /**
+         * 换肤
+         */
+        JButton changeBg  = new JButton("换肤");
+        changeBg.setFont(new Font("System", Font.PLAIN, 19));
+        changeBg.setBounds(230 + (int) (0.045 * width), 50, (int) (0.048 * width), 30);
+        changeBg.setBackground(Color.WHITE);
+        changeBg.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+//                int rand = new Random().nextInt(6);
+                String[] bgPath =  {"img/surface/backgroud1.png","img/surface/backgroud2.jpg","img/surface/backgroud3.jpg",
+                        "img/surface/backgroud4.jpg","img/surface/backgroud5.jpg","img/surface/backgroud6.jpg",
+                        "img/surface/backgroud7.jpg","img/surface/backgroud8.jpg"};
+                ImageIcon imageIcon = new ImageIcon(bgPath[ordinalNum]);
+                imageIcon.setImage(imageIcon.getImage().getScaledInstance((int) (0.232 * width),(int) (0.78 * height),Image.SCALE_DEFAULT));
+                //顺序换肤
+                backgroud.setIcon(imageIcon);
+                ordinalNum++;
+                if(ordinalNum==8){
+                    ordinalNum = 0;
+                }
+            }
+        });
+        frame.add(changeBg);
+        /**
+         * 背景音乐
+         */
+        JButton musicBg  = new JButton("音乐");
+        musicBg.setFont(new Font("System", Font.PLAIN, 19));
+        musicBg.setBounds(230 + (int) (0.045 * width), (int)(frame.getY()*10.4), (int) (0.048 * width), 30);
+        musicBg.setBackground(Color.WHITE);
+        musicBg.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                try {
+                    URL soundFile = new URL("file:music/bgMusic.wav");
+                    AudioClip sound = Applet.newAudioClip(soundFile);
+                    sound.loop();
+
+                } catch (MalformedURLException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
+        frame.add(musicBg);
+
+        /**
          * 好友列表
          */
         //从数据库中获取所有用户
@@ -272,15 +331,46 @@ public class IndexFrame extends PlainDocument {
         JPanel panel1_0 = new JPanel();
         panel1_0.setPreferredSize(new Dimension((int) (0.21 * width), friendList.length * 70));
         panel1_0.setLayout(null);
+        //给好友列表面板添加颜色
+        panel1_0.setBackground(Color.WHITE);
+
         for (int i = 0; i < headList.length; i++) {
             headImg[i].setImage(headImg[i].getImage().getScaledInstance(50, 50, Image.SCALE_DEFAULT));
             headList[i] = new JLabel(headImg[i]);
+
             headList[i].setBounds(0, i * 70, 50, 50);
             panel1_0.add(headList[i]);
         }
+
         for (int i = 0; i < friendList.length; i++) {
             friendList[i] = new JLabel(userList.get(i).getUsername());
             friendList[i].setFont(new Font("System", Font.PLAIN, 26));
+
+            /**
+             * 点击某人头像，与其聊天
+             */
+            User user1 = userList.get(i);
+            String username = user1.getUsername();
+            friendList[i].addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    //跳转到聊天界面
+                    System.out.println("与"+username+"聊天");
+                    if(null != oneChatFrame){
+                        if(!oneChatFrame.getFrame().isVisible()){
+                            oneChatFrame.getFrame().setVisible(true);
+                            DataUtils.client.send("@in^A^A^A"+user.getUsername());
+                        }
+                        oneChatFrame.getFrame().setAlwaysOnTop(true);
+                        oneChatFrame.getFrame().setAlwaysOnTop(false);
+                    }else {
+                        oneChatFrame = new OneChatFrame(user1);
+                    }
+
+
+                }
+            });
+
             friendList[i].setBounds(60, i * 70, (int) (0.2 * width), 70);
             panel1_0.add(friendList[i]);
         }
