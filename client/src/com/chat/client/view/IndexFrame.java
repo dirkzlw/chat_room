@@ -267,7 +267,7 @@ public class IndexFrame extends PlainDocument {
         ImageIcon skin = new ImageIcon("img/surface/skin.png");
         JLabel changeBg  = new JLabel(skin);
         changeBg.setFont(new Font("System", Font.PLAIN, 20));
-        changeBg.setBounds(230 + (int) (0.045 * width), 50, (int) (0.048 * width), 30);
+        changeBg.setBounds(230 + (int) (0.045 * width), 50, (int) (0.024 * width), 30);
         changeBg.setBackground(Color.WHITE);
         changeBg.addMouseListener(new MouseAdapter() {
             @Override
@@ -292,7 +292,7 @@ public class IndexFrame extends PlainDocument {
          */
         JLabel musicBg  = new JLabel(new ImageIcon("img/surface/music.png"));
         musicBg.setFont(new Font("System", Font.PLAIN, 19));
-        musicBg.setBounds(230 + (int) (0.045 * width), (int)(frame.getY()*10.4), (int) (0.048 * width), 30);
+        musicBg.setBounds(230 + (int) (0.066 * width), 50, (int) (0.024 * width), 30);
         musicBg.setOpaque(false);
         musicBg.addMouseListener(new MouseAdapter() {
             boolean flag = false;
@@ -302,7 +302,7 @@ public class IndexFrame extends PlainDocument {
                 System.out.println("标志位："+flag);
                 if(flag) {
                     System.out.println("开始播放。。。");
-                    sound.play();
+                    sound.loop();
                 }else {
                     System.out.println("停止播放。。");
                     sound.stop();
@@ -319,6 +319,37 @@ public class IndexFrame extends PlainDocument {
                 }
             }
         });
+        /**
+         * 个人博客
+         */
+        JLabel blog  = new JLabel(new ImageIcon("img/surface/space.png"));
+        blog.setFont(new Font("System", Font.PLAIN, 19));
+        blog.setBounds(230 + (int) (0.084 * width), 50, (int) (0.024 * width), 30);
+        blog.setOpaque(false);
+        blog.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                //判断当前系统是否支持Java AWT Desktop扩展
+                if (java.awt.Desktop.isDesktopSupported()) {
+                    try {
+                        //创建一个URI实例
+                        java.net.URI uri = java.net.URI.create("http://www.baidu.com/");
+                        //获取当前系统桌面扩展
+                        java.awt.Desktop dp = java.awt.Desktop.getDesktop();
+                        //判断系统桌面是否支持要执行的功能
+                        if (dp.isSupported(java.awt.Desktop.Action.BROWSE)) {
+                            //获取系统默认浏览器打开链接
+                            dp.browse(uri);
+                        }
+                    } catch (java.io.IOException e1) {
+                        System.out.println("无法获取系统默认浏览器或者系统不支持。。");
+                        JOptionPane.showMessageDialog(null,"无法获取系统默认浏览器或者系统不支持。。","提醒",JOptionPane.PLAIN_MESSAGE);
+                    }
+                }
+            }
+        });
+        frame.add(blog);
+
         /**
          * 好友列表
          */
