@@ -83,6 +83,29 @@ public class ChatManager {
     }
 
     /**
+     * 给指定用户发消息
+     *
+     * @param username
+     * @param msg
+     */
+    public static void sendToClient(String username,String toUsername, String msg) {
+        Socket client = DataUtils.clientMap.get(toUsername);
+        if (!isClientClose(client)) {
+            try {
+                os = client.getOutputStream();
+                dos = new DataOutputStream(os);
+                dos.writeUTF(username + "@user^A^A^A" + msg);
+                dos.flush();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.out.println(username + "未在线");
+        }
+    }
+
+    /**
      * 判断客户端是否退出连接
      *
      * @param socket
@@ -97,5 +120,6 @@ public class ChatManager {
             return true;
         }
     }
+
 
 }

@@ -1,6 +1,5 @@
 package com.chat.client.view;
 
-import com.chat.client.client.Client;
 import com.chat.client.po.User;
 import com.chat.client.utils.DataUtils;
 import com.chat.client.utils.FtpUtils;
@@ -10,7 +9,9 @@ import lombok.Getter;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
+import javax.swing.text.Document;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -31,17 +32,22 @@ public class OneChatFrame {
     private JFrame frame;
     private TuFrame tuFrame;
     private FlistFrame flistFrame;
+    @Getter
     private Timer timer;
-    private JTextPane textPane = new JTextPane();
+    @Getter
+    private JTextPane oneChatPane = new JTextPane();
     @Getter
     private boolean isClose = false;
     private JLabel jlist = new JLabel("聊天对象", JLabel.CENTER);
-    private JTextArea memberList = new JTextArea();
 
     public OneChatFrame() {
     }
 
-    public OneChatFrame(User user) {
+    public OneChatFrame(User user, User toUser) {
+        if (!isClose()) {
+            //初始化Client
+            DataUtils.client.getOneChatFrameMap().put(user.getUsername(), this);
+        }
         // 设置窗口外观
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -53,7 +59,7 @@ public class OneChatFrame {
         Font font = new Font("System", Font.PLAIN, 18);
         frame = new JFrame();
         //设置窗口相关参数
-        frame.setTitle("与"+user.getUsername()+"聊天");
+        frame.setTitle(toUser.getUsername());
         // 位置及大小
         frame.setBounds((int) (0.2 * width), (int) (0.13 * height), (int) (0.61 * width), (int) (0.7 * height));
         try {
@@ -70,8 +76,6 @@ public class OneChatFrame {
             public void windowClosing(WindowEvent e) {
                 //窗口关闭，停止定时器
                 timer.cancel();
-                //停止client
-//                DataUtils.client.send("@exit^A^A^A");
                 // 将当前对象置空
                 isClose = true;
             }
@@ -86,14 +90,14 @@ public class OneChatFrame {
         panel1.setBounds(1, 1, (int) (0.78 * 0.6 * width), (int) (0.585 * 0.7 * height));
         panel1.setBorder(BorderFactory.createEtchedBorder());
         // 添加文本框
-        textPane.setFont(font);
-        textPane.setEditable(false);
+        oneChatPane.setFont(font);
+        oneChatPane.setEditable(false);
         // 以下3行 实现滚动条保持在最下部
-        DefaultCaret caret = (DefaultCaret) textPane.getCaret();
+        DefaultCaret caret = (DefaultCaret) oneChatPane.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-        textPane.setSelectionStart(textPane.getText().length());
+        oneChatPane.setSelectionStart(oneChatPane.getText().length());
         // 添加滚动条
-        JScrollPane scrollPanel1 = new JScrollPane(textPane);
+        JScrollPane scrollPanel1 = new JScrollPane(oneChatPane);
         scrollPanel1.setBounds(10, 2, (int) (0.78 * 0.6 * width) - 10, (int) (0.585 * 0.7 * height) - 5);
         scrollPanel1.setBorder(null); // 去除边框
         panel1.add(scrollPanel1);
@@ -122,7 +126,14 @@ public class OneChatFrame {
         sendBtn.setBounds((int) (0.78 * 0.6 * width) - 113, (int) (0.324 * 0.7 * height) - 52, 100, 40);
         sendBtn.addActionListener(e -> {
             String inLine = textIn.getText();
-            DataUtils.client.send(inLine);
+            //给指定用户发送消息
+            DataUtils.client.send(user.getUsername() + "@user^A^A^A" + toUser.getUsername() + "@user^A^A^A" + inLine);
+            Document doc = this.oneChatPane.getDocument();
+            try {
+                doc.insertString(doc.getLength(), user.getUsername() + "\n    " + inLine+"\n", null);
+            } catch (BadLocationException e1) {
+                e1.printStackTrace();
+            }
             textIn.setText("");
         });
         panel2.add(sendBtn);
@@ -171,9 +182,9 @@ public class OneChatFrame {
                         } catch (FileNotFoundException e1) {
                             e1.printStackTrace();
                         }
-                        if(b){
+                        if (b) {
                             DataUtils.client.send("@file^A^A^A" + fileName);
-                        }else {
+                        } else {
                             JOptionPane.showMessageDialog(null, "标题【错误】", "上传失败，请检查网络！", JOptionPane.ERROR_MESSAGE);
                         }
                     }
@@ -242,8 +253,8 @@ public class OneChatFrame {
         panel4.setBounds((int) (0.782 * 0.6 * width), (int) (0.633 * 0.7 * height), (int) (0.2285 * 0.6 * width), (int) (0.324 * 0.7 * height));
         //添加聊天好友头像
         ImageIcon imageIcon = new ImageIcon(user.getHeadUrl());
-        System.out.println(imageIcon);
-        imageIcon.setImage(imageIcon.getImage().getScaledInstance((int) (0.2285 * 0.6 * width) - 20, (int) (0.32 * 0.7 * height),Image.SCALE_DEFAULT));
+//        System.out.println(imageIcon);
+        imageIcon.setImage(imageIcon.getImage().getScaledInstance((int) (0.2285 * 0.6 * width) - 20, (int) (0.32 * 0.7 * height), Image.SCALE_DEFAULT));
         JLabel head = new JLabel(imageIcon);
 //        head.setBackground(Color.white);
         head.setBounds(20, 1, (int) (0.2285 * 0.6 * width) - 20, (int) (0.32 * 0.7 * height));
@@ -251,10 +262,6 @@ public class OneChatFrame {
         frame.add(panel4);
 
 //
-    }
-
-    public static void main(String[] args) {
-        new OneChatFrame(new User("wu","1","img/head/1.png","hello"));
     }
 
 }
@@ -344,7 +351,7 @@ class OneFlistFrame {
         JLabel[] bts = new JLabel[fileNameList.size()];
         JLabel[] jls = new JLabel[fileNameList.size()];
         JPanel panel = new JPanel();
-        panel.setPreferredSize(new Dimension(190, 30 * (jls.length+1)));
+        panel.setPreferredSize(new Dimension(190, 30 * (jls.length + 1)));
         panel.setLayout(null);
         panel.setBackground(Color.white);
 
@@ -378,8 +385,8 @@ class OneFlistFrame {
                     int resultVal = fileChooser.showSaveDialog(null); // 显示选择器
                     if (resultVal == fileChooser.APPROVE_OPTION) { // 判断是否确定选择文件
                         File file = fileChooser.getSelectedFile();
-                        if(null!=file){
-                            if(!file.exists()){
+                        if (null != file) {
+                            if (!file.exists()) {
                                 try {
                                     file.createNewFile();
                                 } catch (IOException e1) {
@@ -393,16 +400,16 @@ class OneFlistFrame {
                                         filename,
                                         file.getParent(),
                                         file.getName());
-                                if(b){
+                                if (b) {
                                     frame.dispose();
                                     frame = null;
-                                    JOptionPane.showMessageDialog(null, "文件下载成功！","【成功】",JOptionPane.INFORMATION_MESSAGE);
-                                }else {
+                                    JOptionPane.showMessageDialog(null, "文件下载成功！", "【成功】", JOptionPane.INFORMATION_MESSAGE);
+                                } else {
                                     JOptionPane.showMessageDialog(null, "下载失败，请检查网络！", "【错误】", JOptionPane.ERROR_MESSAGE);
                                 }
-                            }else {
+                            } else {
                                 int response = JOptionPane.showConfirmDialog(null, "确认替换文件？", "确认", JOptionPane.YES_NO_OPTION);
-                                if(response==0){
+                                if (response == 0) {
                                     boolean b = FtpUtils.downFile("39.107.249.220",
                                             21,
                                             "html_fs",
@@ -411,11 +418,11 @@ class OneFlistFrame {
                                             filename,
                                             file.getParent(),
                                             file.getName());
-                                    if(b){
+                                    if (b) {
                                         frame.dispose();
                                         frame = null;
-                                        JOptionPane.showMessageDialog(null, "文件下载成功！","【成功】",JOptionPane.INFORMATION_MESSAGE);
-                                    }else {
+                                        JOptionPane.showMessageDialog(null, "文件下载成功！", "【成功】", JOptionPane.INFORMATION_MESSAGE);
+                                    } else {
                                         JOptionPane.showMessageDialog(null, "下载失败，请检查网络！", "【错误】", JOptionPane.ERROR_MESSAGE);
                                     }
                                 }

@@ -1,5 +1,6 @@
 package com.chat.client.view;
 
+import com.chat.client.client.ClientThread;
 import com.chat.client.dao.UserDao;
 import com.chat.client.po.User;
 import com.chat.client.service.UserService;
@@ -25,7 +26,6 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import java.util.Random;
 
 /**
  * @author Ranger
@@ -49,7 +49,6 @@ public class IndexFrame extends PlainDocument {
     private JFrame frame;
     private int limit;  //限制的长度
     private ChatFrame chatFrame;
-    private OneChatFrame oneChatFrame;
 
     public IndexFrame(){}
 
@@ -82,8 +81,6 @@ public class IndexFrame extends PlainDocument {
         backgroud.setOpaque(false);
         backgroud.setBounds(0, 0, (int) (0.232 * width), (int) (0.78 * height));
 
-
-
         frame = new JFrame();
         //设置窗口相关参数
         // 位置及大小
@@ -97,11 +94,16 @@ public class IndexFrame extends PlainDocument {
         frame.setResizable(false); // 窗口大小不可改变
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE); // 关闭窗口程序结束
         frame.setLayout(null); // 布局设置为空
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                System.exit(0);
+            }
+        });
 
         //添加头像--先从本地读取，未读到根据url下载到本地
         String suf = FtpUtils.readHeadImg(user);
-        String sf = FtpUtils.readHeadImg(user);
-        ImageIcon headIcon = new ImageIcon("img/head/" + sf);
+        ImageIcon headIcon = new ImageIcon("img/head/" + suf);
 
         JLabel sculLabel = new JLabel();
         sculLabel.setBounds(50, 50, (int) (0.045 * width), (int) (0.078 * height));
@@ -178,8 +180,6 @@ public class IndexFrame extends PlainDocument {
                             }
 
                         }
-
-
                         // url : 39.107.249.220:888/img/logo.png
                         user.setHeadUrl("39.107.249.220:888/img/" + filename);
                         //在后台更新user
@@ -203,14 +203,12 @@ public class IndexFrame extends PlainDocument {
         nameLabel.setFont(new Font("System", Font.PLAIN, 26));
         nameLabel.setBounds(70 + (int) (0.045 * width), 50, (int) (0.08 * width), 30);
 
-
         /**
          * 修改昵称
          */
         nameLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-//                super.mouseClicked(e);
                 String nickName = JOptionPane.showInputDialog("更改昵称");
                 if(nickName==null||"".equals(nickName)){
                     System.out.println("取消更改。。");
@@ -255,7 +253,6 @@ public class IndexFrame extends PlainDocument {
                     user.setSignStr(signField.getText().trim());
                     System.out.println("userService = " + userService);
                     userService.updateSign(user);
-
                 }
             }
         });
@@ -400,27 +397,25 @@ public class IndexFrame extends PlainDocument {
             friendList[i].setFont(new Font("System", Font.PLAIN, 26));
 
             /**
-             * 点击某人头像，与其聊天
+             * 点击某人标签，与其聊天
              */
-            User user1 = userList.get(i);
-            String username = user1.getUsername();
+            int finalI = i;
             friendList[i].addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     //跳转到聊天界面
-                    System.out.println("与"+username+"聊天");
+                    System.out.println("与"+userList.get(finalI).getUsername()+"聊天");
+                    OneChatFrame oneChatFrame = DataUtils.client.getOneChatFrameMap().get(userList.get(finalI).getUsername());
                     if(null != oneChatFrame){
                         if(!oneChatFrame.getFrame().isVisible()){
                             oneChatFrame.getFrame().setVisible(true);
-                            DataUtils.client.send("@in^A^A^A"+user.getUsername());
                         }
                         oneChatFrame.getFrame().setAlwaysOnTop(true);
                         oneChatFrame.getFrame().setAlwaysOnTop(false);
                     }else {
-                        oneChatFrame = new OneChatFrame(user1);
+                        oneChatFrame = new OneChatFrame(user,userList.get(finalI));
+                        DataUtils.client.getOneChatFrameMap().put(userList.get(finalI).getUsername(), oneChatFrame);
                     }
-
-
                 }
             });
 

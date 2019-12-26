@@ -43,7 +43,16 @@ public class ServerThread extends Thread {
                                 ChatManager.sendToClients(msg);
                             }
                             continue;
-                        } else if(line.contains("@in^A^A^A")){
+                        } else if (line.contains("@user^A^A^A")) {
+                            //给指定用户发消息
+                            synchronized (DataUtils.clientMap){
+                                System.out.println("ServerThread.run");
+                                String[] split = line.split("@user\\^A\\^A\\^A");
+                                ChatManager.sendToClient(split[0], split[1],split[2]);
+                                continue;
+                            }
+
+                        } else if (line.contains("@in^A^A^A")) {
                             synchronized (DataUtils.online) {
                                 String msg = "系统提示  " + DateUtils.getDate() + "\n    · "
                                         + clientName + "进入群聊..." + "当前人数：" + ++DataUtils.online;
@@ -58,7 +67,7 @@ public class ServerThread extends Thread {
                                 ChatManager.sendToClients(msg);
                             }
                             continue;
-                        }else if(line.contains("@file^A^A^A")){
+                        } else if (line.contains("@file^A^A^A")) {
                             //处理文件
                             synchronized (DataUtils.online) {
                                 String msg = clientName + "  " + DateUtils.getDate() + "\n    · "

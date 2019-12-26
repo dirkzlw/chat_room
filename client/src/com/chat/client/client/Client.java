@@ -1,6 +1,7 @@
 package com.chat.client.client;
 
 import com.chat.client.po.User;
+import com.chat.client.view.OneChatFrame;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,7 +9,9 @@ import javax.swing.*;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ranger
@@ -26,6 +29,8 @@ public class Client {
     private List<User> userList;
     @Getter
     private Socket server;
+    @Getter
+    private Map<String, OneChatFrame> oneChatFrameMap = new HashMap<>();
     //初始化连接
     public Client() {
         try {
