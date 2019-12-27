@@ -36,14 +36,15 @@ public class ServerThread extends Thread {
                 try {
                     synchronized (this) {
                         String line = dis.readUTF();
-                        if ("@exit^A^A^A".equals(line)) {
-                            synchronized (DataUtils.online) {
-                                String msg = "系统提示  " + DateUtils.getDate() + "\n    · "
-                                        + clientName + "已退出群聊..." + "当前人数：" + --DataUtils.online;
-                                ChatManager.sendToClients(msg);
-                            }
-                            continue;
-                        } else if (line.contains("@user^A^A^A")) {
+//                        if ("@exit^A^A^A".equals(line)) {
+//                            synchronized (DataUtils.online) {
+//                                String msg = "系统提示  " + DateUtils.getDate() + "\n    · "
+//                                        + clientName + "已退出群聊..." + "当前人数：" + --DataUtils.online;
+//                                ChatManager.sendToClients(msg);
+//                            }
+//                            continue;
+//                        } else
+                        if (line.contains("@user^A^A^A")) {
                             //给指定用户发消息
                             synchronized (DataUtils.clientMap){
                                 System.out.println("ServerThread.run");
@@ -52,14 +53,16 @@ public class ServerThread extends Thread {
                                 continue;
                             }
 
-                        } else if (line.contains("@in^A^A^A")) {
-                            synchronized (DataUtils.online) {
-                                String msg = "系统提示  " + DateUtils.getDate() + "\n    · "
-                                        + clientName + "进入群聊..." + "当前人数：" + ++DataUtils.online;
-                                ChatManager.sendToClients(msg);
-                            }
-                            continue;
-                        } else if (line.contains("@img^A^A^A")) {
+                        }
+//                        else if (line.contains("@in^A^A^A")) {
+//                            synchronized (DataUtils.online) {
+//                                String msg = "系统提示  " + DateUtils.getDate() + "\n    · "
+//                                        + clientName + "进入群聊..." + "当前人数：" + ++DataUtils.online;
+//                                ChatManager.sendToClients(msg);
+//                            }
+//                            continue;
+//                        }
+                        else if (line.contains("@img^A^A^A")) {
                             //处理表情包
                             synchronized (DataUtils.online) {
                                 String msg = clientName + "  " + DateUtils.getDate() + "\n    · "

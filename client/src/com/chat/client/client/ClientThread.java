@@ -2,7 +2,6 @@ package com.chat.client.client;
 
 import com.chat.client.po.User;
 import com.chat.client.utils.DataUtils;
-import com.chat.client.utils.WindowXY;
 import com.chat.client.view.OneChatFrame;
 
 import javax.swing.*;
@@ -63,7 +62,6 @@ public class ClientThread extends Thread {
                         //先展示文本
                         Document doc = textPane.getDocument();
                         doc.insertString(doc.getLength(), split2[0] + "[文件] " + split2[1] + "\n", null);
-                        //展示图片
                     } else {
                         Document doc = textPane.getDocument();
                         doc.insertString(doc.getLength(), split[0] + "\n", null);

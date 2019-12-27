@@ -330,7 +330,7 @@ public class IndexFrame extends PlainDocument {
                 if (java.awt.Desktop.isDesktopSupported()) {
                     try {
                         //创建一个URI实例
-                        java.net.URI uri = java.net.URI.create("http://www.baidu.com/");
+                        java.net.URI uri = java.net.URI.create("http://zlwmyy.xyz:81/");
                         //获取当前系统桌面扩展
                         java.awt.Desktop dp = java.awt.Desktop.getDesktop();
                         //判断系统桌面是否支持要执行的功能
@@ -458,7 +458,7 @@ public class IndexFrame extends PlainDocument {
                 if(null != chatFrame){
                     if(!chatFrame.getFrame().isVisible()){
                         chatFrame.getFrame().setVisible(true);
-                        DataUtils.client.send("@in^A^A^A"+user.getUsername());
+//                        DataUtils.client.send("@in^A^A^A"+user.getUsername());
                     }
                     chatFrame.getFrame().setAlwaysOnTop(true);
                     chatFrame.getFrame().setAlwaysOnTop(false);

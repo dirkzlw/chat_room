@@ -1,6 +1,5 @@
 package com.chat.client.view;
 
-import com.chat.client.client.Client;
 import com.chat.client.client.ClientThread;
 import com.chat.client.po.User;
 import com.chat.client.utils.DataUtils;
@@ -12,21 +11,16 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.DefaultCaret;
-import javax.swing.text.Document;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.Socket;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -90,7 +84,7 @@ public class ChatFrame {
                 //窗口关闭，停止定时器
                 timer.cancel();
                 //停止client
-                DataUtils.client.send("@exit^A^A^A");
+//                DataUtils.client.send("@exit^A^A^A");
                 // 将当前对象置空
                 frame.setVisible(false);
                 close = true;
@@ -108,7 +102,7 @@ public class ChatFrame {
         // 添加文本框
         textPane.setFont(font);
         textPane.setEditable(false);
-        // 以下3行 实现滚动条保持在最下部
+        // 以下3行 实现滚动条保持在最下部并实现面板更新内容保持在最新位置
         DefaultCaret caret = (DefaultCaret) textPane.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         textPane.setSelectionStart(textPane.getText().length());
@@ -268,10 +262,6 @@ public class ChatFrame {
         scrollPanel3.setBounds(20, 1, (int) (0.2285 * 0.6 * width) - 20, (int) (0.32 * 0.7 * height));
         scrollPanel3.setBorder(null); // 去除边框
         panel4.add(scrollPanel3);
-    }
-
-    public static void main(String[] args) {
-        new ChatFrame(null, null, null);
     }
 
 }
