@@ -35,9 +35,9 @@ public class Client {
     public Client() {
         try {
             //公网IP：39.107.249.220
-            //局域网IP：
+            //局域网IP：192.168.43.86
             //本地IP：127.0.0.1
-            server = new Socket("39.107.249.220", 8088);
+            server = new Socket("192.168.43.86", 8088);
             dos = new DataOutputStream(server.getOutputStream());
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "服务器已关闭...3秒后退出程序!", "【错误】", JOptionPane.ERROR_MESSAGE);
